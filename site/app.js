@@ -196,6 +196,7 @@
   // This is a view contract, NOT a synthetic file or approval assertion.
   const slotDefinitions = {
     "drawings": [
+      ["working-drawings", "Working drawings · Footing & reinforcement details", r => /working[ -]?drawing|reinforcement detail|bar bending|\.svg\b/i.test([r.title,r.document_slot,r.original_filename].join(" "))],
       ["architectural-pdf", "Architectural drawings · PDF", r => /architecture/i.test(r.discipline) && r.format === "PDF"],
       ["architectural-dwg", "Architectural drawings · DWG", r => /architecture/i.test(r.discipline) && r.format === "DWG"],
       ["structural-pdf", "Structural drawings · PDF", r => /structur/i.test(r.discipline) && r.format === "PDF"],
@@ -293,7 +294,15 @@
         text(slotTitle,"small",slotCount ? slotCount+" registered" : "Not registered");
         slotCard.append(slotTitle);
         const content=make("div",null,"slot-contents");
-        if (group.key === "project-packets" && hasPackets && packetMatches) {
+        // Project-specific preview, separate from original owner-controlled resource records.
+        // Review route stays on the CAD repository until Actions/Pages and engineering approval are verified.
+        if (group.key === "drawings" && slot.key === "working-drawings" &&
+            /harisharan|harisaran/i.test(p.name)) {
+          const link=text(content,"a","Open footing working drawings · FD-01 review","packet-link");
+          link.href="https://github.com/FabinGurung/jp-drawing-coordination/pull/132";
+          link.target="_blank";link.rel="noopener noreferrer";
+          text(content,"p","18 footings · colored location plan, reinforcement views and provisional bar schedule. Not approved for construction.","slot-empty");
+        } else if (group.key === "project-packets" && hasPackets && packetMatches) {
           const a=text(content,"a","Open A/B/C documents · "+p.document_count+" linked PDFs","packet-link");
           a.href="./resources/project-documents.html?project="+encodeURIComponent(p.project_id);
         } else if (matched.length) {
