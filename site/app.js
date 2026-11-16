@@ -335,7 +335,7 @@
     root.append(stack);
     const siblings=orderedProjects(state.company),at=siblings.findIndex(x=>x.project_id===p.project_id);
     const pager=make("nav",null,"page-trail project-pager");pager.setAttribute("aria-label","Previous and next projects");
-    const back=text(pager,"a","← All "+p.company+" projects");back.href="./?company="+encodeURIComponent(state.company);
+    const companyBack=text(pager,"a","← All "+p.company+" projects");companyBack.href="./?company="+encodeURIComponent(state.company);
     for(const [position,label] of [[at-1,"← Previous: "],[at+1,"Next: "]]) {const item=siblings[position];if(item){const link=text(pager,"a",label+item.name+(position>at?" →":""));link.href="./?project="+encodeURIComponent(item.project_id);}}
     root.append(pager);
   }
