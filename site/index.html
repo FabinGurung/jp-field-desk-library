@@ -5,9 +5,9 @@
 <title>Desk Resources · A9 Field &amp; Desk Library</title><link rel="stylesheet" href="./styles.css"><script defer src="./app.js"></script>
 </head><body>
 <a class="skip" href="#main">Skip to library</a>
-<header class="north" id="north"><a class="brand" href="./workspaces.html" aria-label="A9 Field and Desk Operations Library">
+<header class="north" id="north"><a class="brand" href="./" aria-label="A9 Field and Desk Operations Library">
   <span class="brand-icon" aria-hidden="true">A9</span><span><strong>Field &amp; Desk</strong><small>Operations Library</small></span>
-</a><nav aria-label="Primary resource tabs"><a href="./" aria-current="page">Desk Resources</a><a href="./field.html">Field Resources</a><a href="./resources/working-drawings.html">Working Drawings</a><a href="./workspaces.html">Overview</a><a href="./operations.html">Source custody</a><a href="./editing.html">How to edit</a><a href="./memory-wall/">Google Sheets</a></nav></header>
+</a><nav aria-label="Primary resource tabs"><a href="./" aria-current="page">Desk Resources</a><a href="./field.html">Field Resources</a><a href="./memory-wall/">Memory Wall · Sheets</a><a href="./editing.html">How to edit</a></nav></header>
 <div class="layout">
 <aside class="west" id="west" aria-label="Company navigation">
   <p class="eyebrow">WEST · ORGANIZATIONS</p><h2>Companies</h2>
@@ -20,7 +20,7 @@
     <h1>Desk Resources — engineering files by project.</h1>
     <p>Drawings, structural models and reports follow the same sections for every project. Unregistered files show an explicit empty state. For worker records and bills use Field Resources.</p>
   </div><div class="intro-metrics"><span><strong id="metric-companies">—</strong><small>Company groups</small></span><span><strong id="metric-projects">—</strong><small>Projects</small></span><span><strong id="metric-records">—</strong><small>Resource references</small></span></div></section>
-<div class="toolbar"><label for="library-search">Search this directory</label><div class="search-line">
+<nav class="section-toc" aria-label="Desk contents"><a href="#company-nav">Companies</a><a href="#library-search">Search &amp; filters</a><a href="#workspace">Projects and files</a><a href="#source-note">Verification</a></nav><div class="toolbar"><label for="library-search">Search this directory</label><div class="search-line">
     <input id="library-search" type="search" placeholder="Company, project, file or discipline…" autocomplete="off">
     <button type="button" id="clear-search">Clear</button>
   </div>
@@ -37,18 +37,18 @@
   <p id="site-status" class="status-line" role="status" aria-live="polite">Reading the published index…</p></div>
   <div id="breadcrumbs" class="breadcrumbs" aria-label="Current location"></div>
   <div id="workspace" class="workspace"><p class="empty">Loading reviewed resource directories…</p></div>
-  <section class="source-note"><p class="eyebrow">VERIFY BEFORE USING</p>
+  <section class="source-note" id="source-note"><p class="eyebrow">VERIFY BEFORE USING</p>
     <h2>Published listing ≠ approved drawing or unrestricted file.</h2>
     <p>Google Drive continues to enforce permissions on each original. A source readback row is owner-maintained evidence, not a fresh independent Drive metadata read. Engineering acceptance, signatures and issued revisions must be checked at the original source.</p>
   </section>
-</main>
+<nav class="page-trail" aria-label="Previous and next sections"><a href="./memory-wall/">← Memory Wall &amp; Sheets</a><a href="./field.html">Field Resources →</a></nav></main>
 <aside class="east" id="east" aria-label="Selected resource details">
   <p class="eyebrow">EAST · RECORD PROVENANCE</p><h2>Source details</h2>
   <div id="record-detail"><p class="soft">Choose a resource to see its document type, origin, recorded access status, source check date and original Drive link.</p></div>
-  <div class="east-footer"><strong>Where do edits happen?</strong><p>The live register owns display names and publication flags. The original document itself must be edited in its existing Google Drive location.</p><a href="./editing.html">Open editing guide</a></div>
+  <div class="east-footer"><strong>Useful actions</strong><p><a href="./memory-wall/">Find working Google Sheets</a> · <a href="./field.html">View field records</a></p><strong>Where do edits happen?</strong><p>The live register owns display names and publication flags. The original document itself must be edited in its existing Google Drive location.</p><a href="./editing.html">Open editing guide</a></div>
 </aside>
 </div>
 <footer class="south" id="south"><div><p class="eyebrow">SOUTH · PROVENANCE / HISTORY</p><strong>A7 source discipline</strong><p>Drive preserves originals · GitHub versions the publisher · Actions tests and publishes · Pages is the public-safe window, never the source of truth.</p></div>
-<div class="foot-links"><a href="./field.html">Field Resources</a><a href="./workspaces.html">Workspaces</a><a href="./money.html">Money &amp; bills</a><a href="./editing.html">Sources &amp; edits</a><a href="https://github.com/FabinGurung/jp-field-desk-library/actions/workflows/resource-library-pages.yml">Build history</a><a href="https://github.com/FabinGurung/jp-field-desk-library/releases">Releases</a><a href="https://fabingurung.github.io/jp-a7-system-registry/memory-wall.html#platform-role-board">A7 memory wall</a></div></footer>
+<div class="foot-links"><a href="./field.html">Field Resources</a><a href="./memory-wall/">Memory Wall</a><a href="./money.html">Money &amp; bills</a><a href="./editing.html">Sources &amp; edits</a><a href="https://github.com/FabinGurung/jp-field-desk-library/actions/workflows/resource-library-pages.yml">Build history</a><a href="https://github.com/FabinGurung/jp-field-desk-library/releases">Releases</a><a href="https://fabingurung.github.io/jp-a7-system-registry/memory-wall.html#platform-role-board">A7 memory wall</a></div></footer>
 <noscript><p class="empty">JavaScript is needed for the searchable company directory. See the editing guide for the authoritative register.</p></noscript>
 </body></html>

@@ -17,6 +17,8 @@ async function qa() {
     assert.equal(await page.locator(".project-card").count(),1);
     await page.locator(".project-card").first().click();
     assert.equal(await page.locator(".resource-line").count(),1);
+    assert.equal(await page.locator(".resource-entry .resource-open").count(),1);
+    assert.match(await page.locator(".resource-entry .resource-open").first().getAttribute("href"), /^https:\/\/drive\.google\.com\//);
     // Architecture-only example still exposes empty Structural PDF/DWG slots.
     assert.equal(await page.locator(".resource-slot").count() >= 12, true);
     const emptyStructural = page.locator('[data-slot="structural-pdf"]');
