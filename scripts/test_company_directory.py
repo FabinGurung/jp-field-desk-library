@@ -90,6 +90,31 @@ class CompanyDirectoryTest(unittest.TestCase):
             packet = json.loads((Path(folder) / "document-packets.json").read_text())
             self.assertEqual(packet["projects"][0]["company"], "Example Construction C")
 
+    def test_verified_astam_intake_identity_is_allowed_without_fabricating_prj_id(self):
+        tables = sample()
+        row = tables["resources"][1]
+        row[4] = "JPENT-ASTAM-2026-01"
+        row[5] = "Astam Village — Land Feasibility"
+        row[12] = "JP Enterprise"
+        with tempfile.TemporaryDirectory() as folder:
+            build(tables, Path(folder), "2026-11-16T17:00:00+05:45")
+            catalog = json.loads((Path(folder) / "catalog.json").read_text())
+            astam = next(p for p in catalog["projects"] if p["project_id"] == "JPENT-ASTAM-2026-01")
+            self.assertEqual(astam["company"], "JP Enterprise")
+            self.assertEqual(astam["name"], "Astam Village — Land Feasibility")
+            self.assertEqual(astam["resource_count"], 1)
+
+        # Scope the exception to this exact project and verified owner.
+        with tempfile.TemporaryDirectory() as folder:
+            row[12] = "Unverified Company"
+            with self.assertRaisesRegex(ValueError, "Invalid project identity"):
+                build(tables, Path(folder), "2026-11-16T17:00:00+05:45")
+        with tempfile.TemporaryDirectory() as folder:
+            row[12] = "JP Enterprise"
+            row[4] = "JPENT-OTHER-2026-01"
+            with self.assertRaisesRegex(ValueError, "Invalid project identity"):
+                build(tables, Path(folder), "2026-11-16T17:00:00+05:45")
+
     def test_public_files_and_editor_guide(self):
         from publish_library import SITE_FILES
         for name in ("editing.html", "editing.css", "operations.html", "operations.js",

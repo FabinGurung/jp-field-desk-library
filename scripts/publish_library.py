@@ -97,7 +97,15 @@ def build(tables, out, received_at):
     resources, documents, project_map = [], [], {}
 
     def ensure_project(pid, name, company, code=""):
-        if not re.fullmatch(r"PRJ-[0-9]{6}", pid) or not name.strip():
+        standard_id = re.fullmatch(r"PRJ-[0-9]{6}", pid) is not None
+        # Astam uses its reviewed, existing intake identity while the permanent
+        # PRJ allocation remains pending. Never manufacture a replacement ID.
+        verified_astam_intake = (
+            pid == "JPENT-ASTAM-2026-01"
+            and name == "Astam Village — Land Feasibility"
+            and company.strip() == "JP Enterprise"
+        )
+        if not (standard_id or verified_astam_intake) or not name.strip():
             raise ValueError("Invalid project identity in owner register")
         company = company.strip() or UNASSIGNED_COMPANY
         existing = project_map.get(pid)
