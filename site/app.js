@@ -41,6 +41,11 @@
       return;
     }
     text(root, "h3", r.title);
+    const actions = make("nav",null,"detail-actions");
+    actions.setAttribute("aria-label","Selected source actions");
+    if(safeDrive(r.url)) { const link=text(actions,"a","Open original in Google Drive ↗","source-button"); link.href=r.url; link.target="_blank"; link.rel="noopener noreferrer"; }
+    const related=text(actions,"a","View project directory","detail-project-link"); related.href="./?project="+encodeURIComponent(r.project_id);
+    root.append(actions);
     const fields = [
       ["Project", r.project + " · " + r.project_id],
       ["Resource group", (state.data.groups.find(g => g.key === r.group) || {}).label || r.group],
@@ -59,12 +64,7 @@
       text(root, "h4", label);
       text(root, "p", value);
     }
-    if (safeDrive(r.url)) {
-      const a = text(root, "a", "Open original in Google Drive", "source-button");
-      a.href = r.url;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-    }
+
   }
   function nav() {
     const root = $("company-nav"); root.replaceChildren();
@@ -196,7 +196,6 @@
   // This is a view contract, NOT a synthetic file or approval assertion.
   const slotDefinitions = {
     "drawings": [
-      ["working-drawings", "Working drawings · Footing & reinforcement details", r => /working[ -]?drawing|reinforcement detail|bar bending|\.svg\b/i.test([r.title,r.document_slot,r.original_filename].join(" "))],
       ["architectural-pdf", "Architectural drawings · PDF", r => /architecture/i.test(r.discipline) && r.format === "PDF"],
       ["architectural-dwg", "Architectural drawings · DWG", r => /architecture/i.test(r.discipline) && r.format === "DWG"],
       ["structural-pdf", "Structural drawings · PDF", r => /structur/i.test(r.discipline) && r.format === "PDF"],
@@ -262,6 +261,7 @@
     text(intro,"strong","Same slots for every project");
     text(intro,"p","Empty slots are shown deliberately. Open one to see whether a file has been registered. An empty slot does not prove the original file does not exist.");
     root.append(intro);
+    if(p.project_id.startsWith("JPENT-ASTAM-")) { const notice=make("aside",null,"project-context-note");text(notice,"strong","Astam Village · pre-purchase feasibility");text(notice,"p","Purchase on HOLD · original JP Enterprise sources · approval unverified · permanent PRJ ID pending.");const guide=text(notice,"a","View existing feasibility research ↗");guide.href="./feasibility/";root.append(notice); }
     const stack = make("div",null,"group-stack");
     let matchingFiles = 0;
     const hasQuery = Boolean(state.query);
@@ -294,19 +294,12 @@
         text(slotTitle,"small",slotCount ? slotCount+" registered" : "Not registered");
         slotCard.append(slotTitle);
         const content=make("div",null,"slot-contents");
-        // Project-specific preview, separate from original owner-controlled resource records.
-        // Review route stays on the CAD repository until Actions/Pages and engineering approval are verified.
-        if (group.key === "drawings" && slot.key === "working-drawings" &&
-            /harisharan|harisaran/i.test(p.name)) {
-          const link=text(content,"a","Open footing working drawings · FD-01 review","packet-link");
-          link.href="https://github.com/FabinGurung/jp-drawing-coordination/pull/132";
-          link.target="_blank";link.rel="noopener noreferrer";
-          text(content,"p","18 footings · colored location plan, reinforcement views and provisional bar schedule. Not approved for construction.","slot-empty");
-        } else if (group.key === "project-packets" && hasPackets && packetMatches) {
+        if (group.key === "project-packets" && hasPackets && packetMatches) {
           const a=text(content,"a","Open A/B/C documents · "+p.document_count+" linked PDFs","packet-link");
           a.href="./resources/project-documents.html?project="+encodeURIComponent(p.project_id);
         } else if (matched.length) {
           for (const r of matched) {
+            const entry=make("div",null,"resource-entry");
             const btn=make("button",null,"resource-line");
             btn.type="button";
             btn.setAttribute("aria-pressed",String(state.selected === r.id));
@@ -319,7 +312,9 @@
               state.selected=r.id; detail(r); render();
               if (window.matchMedia("(max-width:700px)").matches) $("east").scrollIntoView({block:"start",behavior:"auto"});
             });
-            content.append(btn);
+            entry.append(btn);
+            if(safeDrive(r.url)) { const open=text(entry,"a","Open original ↗","resource-open"); open.href=r.url;open.target="_blank";open.rel="noopener noreferrer";open.setAttribute("aria-label","Open original in Google Drive: "+r.title); }
+            content.append(entry);
           }
         } else {
           let msg;
@@ -338,6 +333,11 @@
     $("facet-count").textContent=matchingFiles+" of "+p.resource_count+
       " resources match · Empty slots stay visible for consistent project navigation";
     root.append(stack);
+    const siblings=orderedProjects(state.company),at=siblings.findIndex(x=>x.project_id===p.project_id);
+    const pager=make("nav",null,"page-trail project-pager");pager.setAttribute("aria-label","Previous and next projects");
+    const back=text(pager,"a","← All "+p.company+" projects");back.href="./?company="+encodeURIComponent(state.company);
+    for(const [position,label] of [[at-1,"← Previous: "],[at+1,"Next: "]]) {const item=siblings[position];if(item){const link=text(pager,"a",label+item.name+(position>at?" →":""));link.href="./?project="+encodeURIComponent(item.project_id);}}
+    root.append(pager);
   }
   function render() {
     if (!state.data) return;
