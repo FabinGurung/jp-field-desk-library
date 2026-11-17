@@ -26,10 +26,10 @@ a{color:var(--accent)}button{font:inherit;cursor:pointer}button:focus-visible,a:
 @media(max-width:850px){.layout{grid-template-columns:1fr}.frame-wrap iframe{height:510px}.shell{padding:11px 11px 50px}.hero{padding:23px 20px}}
 @media print{.nav,.controls,.frame-wrap,.actions{display:none}.hero{color:#162e23;background:#fff}.panel{box-shadow:none}}
 </style>
-</head>
+<link rel="stylesheet" href="../assets/css/resource-unified.css"></head>
 <body>
 <div class="shell">
-<nav class="nav" aria-label="Site navigation"><a href="../">Desk Resources</a><a href="../field.html">Field Resources</a><a href="../memory-wall/">Memory Wall · Sheets</a><a href="../editing.html">How to edit</a><a href="https://fabingurung.github.io/jp-site-operations/">Site Operations</a><a href="../memory-wall/">Google Sheets</a></nav>
+<nav class="nav" aria-label="Site navigation"><a href="../">Desk Resources</a><a href="../field.html">Field Resources</a><a href="../memory-wall/">Memory Wall · Sheets</a><a href="../editing.html">How to edit</a><a href="https://fabingurung.github.io/jp-site-operations/">Site Operations</a></nav>
 <header class="hero"><div class="eyebrow">FIELD &amp; DESK · PROJECT FILES</div>
 <h1 id="project-name">Project documents</h1>
 <p>Review listed agreements, original drawing sheets, and material schedules in Nepali or English. The original provider and revision status govern, not this preview.</p>
@@ -43,10 +43,12 @@ a{color:var(--accent)}button{font:inherit;cursor:pointer}button:focus-visible,a:
 <div class="frame-wrap"><p id="preview-title" class="preview-title">Select a PDF to preview.</p><p class="hint">This preview is served by Google Drive under its normal permission controls. The website does not publish or duplicate the original PDF bytes.</p>
 <iframe id="preview" title="Selected project document preview" loading="lazy" referrerpolicy="no-referrer"></iframe></div></section>
 </main>
-<footer class="footer"><p>Project-document register is a read-only presentation of source-linked records. Missing contractor signatures, drawing revisions, material approvals and final variations must be confirmed through the authorized project process.</p><a href="../">Back to company directory</a><a href="https://fabingurung.github.io/jp-site-operations/">Communication &amp; Web</a></footer>
+<nav class="page-trail" aria-label="Previous and next Library areas"><a id="back-to-project" href="../">← Project in Desk</a><a href="../field.html">Field source records →</a></nav><footer class="footer"><p>Project-document register is a read-only presentation of source-linked records. Missing contractor signatures, drawing revisions, material approvals and final variations must be confirmed through the authorized project process.</p><a href="../">All projects</a><a href="https://fabingurung.github.io/jp-site-operations/">Communication &amp; Web</a></footer>
 </div>
 <script>
 (()=>{"use strict";
+const qp=new URLSearchParams(location.search),projectID=qp.get("project")||"";
+if(/^PRJ-[0-9]{6}$/.test(projectID))document.getElementById("back-to-project").href="../?project="+encodeURIComponent(projectID);
 const registry="../document-packets.json", $=id=>document.getElementById(id);
 const projectId=new URLSearchParams(location.search).get("project")||"";let lang="ne",data=null;
 const node=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;};

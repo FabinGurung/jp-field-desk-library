@@ -13,6 +13,7 @@ on:
       - 'docs/releases/v1.7.1.md'
       - 'docs/releases/v1.8.0.md'
       - 'docs/releases/v1.8.1.md'
+      - 'docs/releases/v1.9.0.md'
       - 'docs/governance/**'
       - 'docs/operations/**'
       - 'README.md'
@@ -31,6 +32,7 @@ on:
       - 'docs/releases/v1.7.1.md'
       - 'docs/releases/v1.8.0.md'
       - 'docs/releases/v1.8.1.md'
+      - 'docs/releases/v1.9.0.md'
       - 'docs/governance/**'
       - 'docs/operations/**'
       - 'README.md'
@@ -515,4 +517,61 @@ jobs:
           else
             gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
               --title 'Field & Desk Library v1.8.1 — Desk Source Reconciliation' --notes-file "$notes"
+          fi
+
+
+  release-resource-ux-v1-9:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Verify v1.9.0 public UI and finance ownership, then tag exact main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          notes='docs/releases/v1.9.0.md'
+          tag='v1.9.0'
+          if git diff --quiet HEAD^ HEAD -- "$notes"; then
+            echo "No new v1.9.0 milestone in this commit"
+            exit 0
+          fi
+          pages="https://fabingurung.github.io/${GITHUB_REPOSITORY#*/}"
+          for file in index.html field.html money.html operations.html operations.js editing.html \
+            memory-wall/index.html resources/project-documents.html feasibility/index.html \
+            source-custody.json assets/css/resource-unified.css; do
+            curl -fsS --retry 7 --retry-delay 4 --retry-all-errors "$pages/$file?revision=$GITHUB_SHA" | cmp - "site/$file"
+          done
+          curl -fsS --retry 7 --retry-delay 4 --retry-all-errors "$pages/catalog.json?revision=$GITHUB_SHA" > /tmp/resource-v19-catalog.json
+          curl -fsS --retry 7 --retry-delay 4 --retry-all-errors "$pages/document-packets.json?revision=$GITHUB_SHA" > /tmp/resource-v19-packets.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.load(open('/tmp/resource-v19-catalog.json'))
+          p=json.load(open('/tmp/resource-v19-packets.json'))
+          custody=json.loads(Path('site/source-custody.json').read_text())
+          assert c['schema_version']=='2.0.0'
+          assert (len(c['companies']),len(c['projects']),len(c['resources']))==(3,10,74)
+          assert len(p['documents'])==6
+          assert c['source_manifest']['private_payroll_connected'] is False
+          assert len([r for r in c['resources'] if r['project_id']=='JPENT-ASTAM-2026-01'])==6
+          fin=next(r for r in custody['subjects'] if r['id']=='financial-source-evidence')
+          assert fin['status']=='EXTERNAL_OWNER_LINKED' and len(fin['public_links'])==3
+          assert 'VERIFIED_SNAPSHOT' in fin['integration']
+          assert fin['group']=='field' and not custody['live_worker_sync']
+          print('v1.9.0 live Pages readback PASS: 3 companies, 10 projects, 74 resources, 6 documents, no private financial replication')
+          PY
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            test "$(git ls-remote origin "refs/tags/$tag" | cut -f1)" = "$GITHUB_SHA"
+          else
+            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title 'Field & Desk Library v1.9.0 — Unified UI and Source Ownership' --notes-file "$notes"
           fi

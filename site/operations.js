@@ -1,10 +1,18 @@
 "use strict";
 (() => {
  const $=id=>document.getElementById(id), filters=[...document.querySelectorAll("[data-group]")];
- const states={PUBLISHED_CATALOGUE:"REVIEWED DIRECTORY",RESTRICTED_NOT_CONNECTED:"PRIVATE / NOT CONNECTED",ROLLOUT_UNVERIFIED:"ROLLOUT UNVERIFIED",DERIVED_REFERENCE:"HISTORIC DERIVATIVE",INTAKE_PENDING:"SOURCE INTAKE PENDING"};
+ const states={PUBLISHED_CATALOGUE:"REVIEWED DIRECTORY",RESTRICTED_NOT_CONNECTED:"PRIVATE / NOT CONNECTED",ROLLOUT_UNVERIFIED:"ROLLOUT UNVERIFIED",DERIVED_REFERENCE:"HISTORIC DERIVATIVE",INTAKE_PENDING:"SOURCE INTAKE PENDING",EXTERNAL_OWNER_LINKED:"EXTERNAL REGISTER — LINKS ONLY"};
  let sources=[],group="all",selected=null;
  const element=(tag,value,cls)=>{const e=document.createElement(tag);e.textContent=value;if(cls)e.className=cls;return e;};
  function show(s){const out=$("details");out.replaceChildren(element("h3",s.name),element("p",states[s.status],"status-detail"));
+  if(Array.isArray(s.public_links)&&s.public_links.length){
+   const nav=element("nav","","source-actions");nav.setAttribute("aria-label","Open reviewed owner pages");
+   for(const link of s.public_links){
+    if(!/^https:\/\/fabingurung\.github\.io\/jp-estimating-and-boq\/(?:finance\.html|memory-posters\.html|source-sheets\.html)(?:#[A-Za-z0-9-]+)?$/.test(link.url||""))continue;
+    const a=element("a",link.label+" ↗");a.href=link.url;a.target="_blank";a.rel="noopener noreferrer";nav.append(a);
+   }
+   if(nav.childElementCount)out.append(nav);
+  }
   for(const [name,value] of [["Authority",s.authority],["Original custody",s.custody],["Integration",s.integration],["Outstanding boundary",s.limit]])out.append(element("h4",name),element("p",value));
  }
  function render(){const q=$("search").value.trim().toLowerCase();
