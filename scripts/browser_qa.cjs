@@ -69,8 +69,16 @@ async function qa() {
     await page.goto(ROOT + "/editing.html", {waitUntil:"domcontentloaded"});
     assert.match(await page.locator("main").innerText(),/project_resources/);
     assert.equal(await page.locator("a[href*='gid=8000011']").count() > 0,true);
+    await page.goto(ROOT + "/money.html", {waitUntil:"domcontentloaded"});
+    assert.equal(await page.locator("#finance-routing .finance-router article").count(),3);
+    assert.equal(await page.locator('#finance-routing a[href*="/jp-estimating-and-boq/"]').count() >= 3,true);
+    await page.goto(ROOT + "/field.html", {waitUntil:"domcontentloaded"});
+    assert.equal(await page.locator('.finance-bridge a[href*="finance.html#cost-register-triad"]').count(),1);
     await page.goto(ROOT + "/operations.html", {waitUntil:"domcontentloaded"});
     await page.locator("#sources .record").first().waitFor();
+    await page.locator("#sources .record").filter({hasText:"Vendor, contractor and project-payment evidence"}).first().click();
+    assert.equal(await page.locator("#details .source-actions a").count(),3);
+    assert.match(await page.locator("#details .source-actions a").first().getAttribute("href"),/jp-estimating-and-boq/);
     await page.locator("#live-catalogue-readback").waitFor();
     await page.waitForFunction(() => document.getElementById("live-catalogue-readback").textContent.includes("Reviewed catalogue"));
     await page.goto(ROOT + "/workspaces.html", {waitUntil:"domcontentloaded"});
