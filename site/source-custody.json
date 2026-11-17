@@ -1,10 +1,10 @@
 {
   "schema_version": "1.1.0",
-  "as_of_npt": "2026-11-12",
+  "as_of_npt": "2026-11-17",
   "scope": "PUBLIC_SAFE_SOURCE_CUSTODY",
   "live_worker_sync": false,
   "authenticated_private_payroll_reads": true,
-  "description": "Reviewed original-source custody. Authenticated publication now includes only the owner-approved historical CLEAN Payment projection; live W01–W21 Money & Goods remains unconnected.",
+  "description": "Public source-custody snapshot. JP Cost Estimation owns normalized financial working registers and reconciliations; Field & Desk owns original evidence and site records. Approved historical CLEAN Payment remains a separate publication; live W01–W21 Money & Goods is not connected.",
   "subjects": [
     {
       "id": "documents",
@@ -66,12 +66,36 @@
       "custody": "Track issue/revision date, owner, source and approval separately.",
       "integration": "Publish only permitted references and links; original record stays with its issuer.",
       "limit": "A file link is not proof of signed inspection or completed work."
+    },
+    {
+      "id": "financial-source-evidence",
+      "group": "field",
+      "name": "Vendor, contractor and project-payment evidence",
+      "status": "EXTERNAL_OWNER_LINKED",
+      "authority": "JP Cost Estimation owns Vendor Bills V000004, Payments to Projects V000004 and Contractor Bills V000002 working registers, calculations and financial reconciliations. Field & Desk owns original source document custody.",
+      "custody": "Original scanned invoices, supplier receipts, signed site measurements, labour documents and procurement evidence remain in governed project and Finance Drive folders. Do not relocate, duplicate or publish the restricted financial Sheets.",
+      "integration": "Use Estimation's public-safe finance overview, contractor intake snapshot and source-map V000007 (eight working/reference Sheets). Contractor Bills is VERIFIED_SNAPSHOT V000002; authenticated manual source access is not independently verified and no cron was added.",
+      "limit": "Two source claims and 16 OPEN contractor QA issues remain; no claim is certified and no payment verified. Project/company assignment of shared originals is not inferred.",
+      "public_links": [
+        {
+          "label": "Finance three-register overview",
+          "url": "https://fabingurung.github.io/jp-estimating-and-boq/finance.html#cost-register-triad"
+        },
+        {
+          "label": "Contractor Bills snapshot",
+          "url": "https://fabingurung.github.io/jp-estimating-and-boq/memory-posters.html#contractor-bills-intake"
+        },
+        {
+          "label": "Estimation source map",
+          "url": "https://fabingurung.github.io/jp-estimating-and-boq/source-sheets.html"
+        }
+      ]
     }
   ],
   "consumers": [
     {
       "system": "Cost Estimation",
-      "policy": "Validated aggregate labour costs and materials; never source employee attendance or individual advances."
+      "policy": "Owns normalized Vendor Bills, Contractor Bills, Payments to Projects, quantities/BOQ/AOC, financial claims, reconciliation and derived dashboards; Field & Desk retains original evidence and source permissions."
     },
     {
       "system": "Scheduling and Resources",
