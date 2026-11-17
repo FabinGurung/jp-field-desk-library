@@ -23,3 +23,18 @@ Stable technical identities must be maintained privately where source visibility
 The static public custody data is dated, auditable and displays a **historical snapshot** warning when older than 30 days. The document publisher also fails closed when an admitted owner's Drive readback timestamp is malformed or exceeds 30 days of age. This is a freshness check on *owner-entered evidence*, not proof of a fresh Google Drive file metadata read.
 
 Do not label any private source LIVE until authenticated source-specific reads, privacy-reviewed projections and publication evidence are observed.
+
+## 17 November 2026 — Estimation financial working registers and Field source custody
+
+The authoritative **Vendor Bills V000004**, **Payments to Projects V000004** and **Contractor Bills V000002** working Google Sheets remain in the restricted JP Cost Estimation working-Sheets folder. Estimation owns their normalization, source indices, measurements/BOQ/AOC, claims, running bills, financial reconciliation and public-safe derived views. Field & Desk owns original scanned invoices, procurement evidence, signed site measurements, original labour evidence, project documents and human-friendly source navigation.
+
+| Subject | Working record owner | Public-safe route |
+| --- | --- | --- |
+| Vendor invoice lines and reconciliation | JP Cost Estimation — Vendor Bills V000004 | [Finance three-register view](https://fabingurung.github.io/jp-estimating-and-boq/finance.html#cost-register-triad) |
+| Project payments (439 normalized events) | JP Cost Estimation — Payments to Projects V000004 | [Finance three-register view](https://fabingurung.github.io/jp-estimating-and-boq/finance.html#cost-register-triad) |
+| Contractor claims and running bills | JP Cost Estimation — Contractor Bills V000002 | [Contractor snapshot](https://fabingurung.github.io/jp-estimating-and-boq/memory-posters.html#contractor-bills-intake) |
+| Source scans, receipts, field evidence, project packets | Field & Desk and restricted original Drive folders | Existing source-backed Desk/Field links |
+
+Contractor Bills shows **VERIFIED_SNAPSHOT V000002**, not a certified or authenticated scheduled-live result. Its source contains two claims, 33 primary lines, 34 non-additive historic records, 80 indexed original rows, five reconciliations and 16 OPEN QA issues; no claims or payments are certified/verified. Estimation source map V000007 has eight Sheets; Vendor/Contractor readers remain optional manual-only until separately authenticated. [Estimation source directory](https://fabingurung.github.io/jp-estimating-and-boq/source-sheets.html).
+
+No financial Sheets were copied, moved or re-created for Resources. No public website link to restricted working-Sheet IDs was introduced. Existing 35 Library staff Sheet links, historical CLEAN Payment projection, A7 archives, publisher WIF and original Drive permissions remain in force.
