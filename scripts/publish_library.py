@@ -25,7 +25,7 @@ SITE_FILES = ("index.html", "app.js", "styles.css", "resources/project-documents
               "feasibility/buyer-guide/guide.json",
               "ops/data/land-feasibility/astam-village-public.v1.0.json",
               "ops/data/land-feasibility/astam-buyer-guide-public.v1.0.json",
-              "assets/css/jp-theme-tokens.css", "assets/css/site-shell.css",
+              "assets/css/resource-unified.css", "assets/css/jp-theme-tokens.css", "assets/css/site-shell.css",
               "assets/css/jp-botanical.css",
               "assets/botanical/garden-left.svg", "assets/botanical/garden-right.svg",
               "assets/botanical/corner-sprig.svg", "assets/botanical/empty-garden.svg",
