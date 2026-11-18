@@ -78,20 +78,29 @@
    link(routes,"Attendance — project tabs ↗",attendance);
    link(routes,"Project Resources register ↗",sourceDirectory);
    put(routes,"p","These are company or shared working Sheets; a link does not prove this specific project has records. Use the correct Project ID when entering data.");
-   const repoSearch=put(pane,"div",null,"project-owned-actions");
-   put(repoSearch,"strong","Search related GitHub engineering repositories");
-   const sourceCodeTargets=[
-    ["Drawing Coordination", "jp-drawing-coordination"],
-    ["Structural Analysis", "jp-structural-analysis"],
-    ["Cost Estimation", "jp-estimating-and-boq"],
-    ["Site Operations", "jp-site-operations"]
-   ];
-   for(const [label,repo] of sourceCodeTargets){
-     link(repoSearch,label+" — search this project ID ↗",
-       "https://github.com/FabinGurung/"+repo+"/search?q="+encodeURIComponent(p.project_id)+"&type=code");
+   // The drawing repository's public projects.json currently reuses
+   // PRJ-000029 for Ramachandra, but canonical A7 assigns it to Basanti.
+   // Suppress ambiguous project-ID code searches rather than cross-attach.
+   if(p.project_id==="PRJ-000029"){
+     const hold=put(pane,"div",null,"project-owned-actions");
+     put(hold,"strong","CAD identity HOLD — do not attach unrelated files");
+     put(hold,"p","The canonical master lists this ID for Basanti Poudel Baral. The separate CAD index lists Ramachandra Devkota under the same ID. Source records and projects must not be merged without formal reconciliation.");
+     link(hold,"Open A7/CAD identity conflict #146 ↗","https://github.com/FabinGurung/jp-drawing-coordination/issues/146");
+   }else{
+     const repoSearch=put(pane,"div",null,"project-owned-actions");
+     put(repoSearch,"strong","Search related GitHub engineering repositories");
+     const sourceCodeTargets=[
+       ["Drawing Coordination", "jp-drawing-coordination"],
+       ["Structural Analysis", "jp-structural-analysis"],
+       ["Cost Estimation", "jp-estimating-and-boq"],
+       ["Site Operations", "jp-site-operations"]
+     ];
+     for(const [label,repo] of sourceCodeTargets){
+       link(repoSearch,label+" — search this project ID ↗",
+         "https://github.com/FabinGurung/"+repo+"/search?q="+encodeURIComponent(p.project_id)+"&type=code");
+     }
+     put(repoSearch,"p","Exact-ID repository searches, not verified original project folders or engineering approvals. Original CAD/PDF/DWG files open only from source-verified groups above.");
    }
-   put(repoSearch,"p","These are exact-ID repository searches, not verified project folders or current engineering approvals. Original CAD PDFs/DWGs open only from the source-verified file groups above.");
-
    const u=new URL(location.href);u.searchParams.set("project",p.project_id);history.replaceState(null,"",u);
    document.querySelectorAll(".project-card").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.project===p.project_id)));
  }
