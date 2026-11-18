@@ -78,6 +78,20 @@
    link(routes,"Attendance — project tabs ↗",attendance);
    link(routes,"Project Resources register ↗",sourceDirectory);
    put(routes,"p","These are company or shared working Sheets; a link does not prove this specific project has records. Use the correct Project ID when entering data.");
+   const repoSearch=put(pane,"div",null,"project-owned-actions");
+   put(repoSearch,"strong","Search related GitHub engineering repositories");
+   const sourceCodeTargets=[
+    ["Drawing Coordination", "jp-drawing-coordination"],
+    ["Structural Analysis", "jp-structural-analysis"],
+    ["Cost Estimation", "jp-estimating-and-boq"],
+    ["Site Operations", "jp-site-operations"]
+   ];
+   for(const [label,repo] of sourceCodeTargets){
+     link(repoSearch,label+" — search this project ID ↗",
+       "https://github.com/FabinGurung/"+repo+"/search?q="+encodeURIComponent(p.project_id)+"&type=code");
+   }
+   put(repoSearch,"p","These are exact-ID repository searches, not verified project folders or current engineering approvals. Original CAD PDFs/DWGs open only from the source-verified file groups above.");
+
    const u=new URL(location.href);u.searchParams.set("project",p.project_id);history.replaceState(null,"",u);
    document.querySelectorAll(".project-card").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.project===p.project_id)));
  }
