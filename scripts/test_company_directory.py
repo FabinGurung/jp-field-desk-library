@@ -170,7 +170,7 @@ class CompanyDirectoryTest(unittest.TestCase):
         self.assertNotIn("drive.google.com/drive/folders/", field)
         self.assertIn('href="./field.html"', workspaces)
         self.assertIn('href="./"', workspaces)
-        self.assertIn("Original Google Drive records remain authoritative", field)
+        self.assertIn("Original records stay in Google Drive", field)
         money = (ROOT / "site/money.html").read_text()
         self.assertIn("not verified as final", money)
         self.assertIn("01_JP", money)
