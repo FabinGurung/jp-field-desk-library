@@ -44,30 +44,30 @@
  const docs=p=>state.packets.documents.filter(d=>d.project_id===p.project_id&&safeDrive(d.drive_url));
  function details(p){
    state.selected=p.project_id; const pane=$("project-detail-body");pane.replaceChildren();
-   put(pane,"p",p.project_id+" · "+(p.company_project_code||"Intake code pending"),"eyebrow");
+   put(pane,"p","PROJECT FILES","eyebrow");
    put(pane,"h3",p.name);
    put(pane,"p",(p.status||"Status not verified")+" · "+p.company,"project-meta");
-   if(p.verification&&p.verification!=="VERIFIED")put(pane,"p","Project metadata review: "+p.verification,"project-warning");
+   if(p.verification&&p.verification!=="VERIFIED")put(pane,"p","Some project details still need confirmation.","project-warning");
    const rs=resources(p),ds=docs(p);
-   put(pane,"p",rs.length+" registered original links · "+ds.length+" client packet documents","project-count-note");
+   put(pane,"p",rs.length+" file and folder links · "+ds.length+" client documents","project-count-note");
    const grouped={};for(const r of rs)(grouped[classify(r)] ||= []).push(r);
    if(ds.length)grouped["Agreements & project packets"]=ds.map(d=>({title:d.title+" · "+d.version,url:d.drive_url,format:"PDF",approval:d.approval}));
    for(const family of families){
      const section=put(pane,"section",null,"project-family");
      const title=put(section,"h4",family);
      const group=grouped[family]||[];
-     put(title,"small",group.length?(" · "+group.length):" · not registered");
+     put(title,"small",group.length?(" · "+group.length):" · not listed");
      if(group.length){const groupWrap=put(section,"div",null,"source-list");
        for(const r of group){const wrap=put(groupWrap,"div",null,"source-item");
          link(wrap,r.title+" ↗",r.url,"project-source");
-         put(wrap,"small",(r.format||"Original")+" · "+(r.approval||"Approval unverified"));
+         put(wrap,"small",(r.format||"Original")+" · Check approved revision before using");
        }
-     }else put(section,"p","No reviewed source link in this Library. Original files may exist elsewhere; do not infer absence.","no-file");
+     }else put(section,"p","No file listed here yet. Check the project Drive folder or ask the document owner.","no-file");
    }
    if(p.project_id==="JPENT-ASTAM-2026-01"){
       const c=put(pane,"div",null,"project-owned-actions");
       link(c,"Astam land and buyer research →","./feasibility/");
-      put(c,"p","Purchase HOLD · source approvals and a permanent PRJ ID remain unverified.");
+      put(c,"p","Land purchase is on hold pending review of the original documents.");
    }
    const routes=put(pane,"div",null,"project-owned-actions");
    put(routes,"strong","Record the next field entry");
@@ -77,18 +77,18 @@
    if(owner.measurements)link(routes,"Measurement evidence — Fishtail Sheet ↗",owner.measurements);
    link(routes,"Attendance — project tabs ↗",attendance);
    link(routes,"Project Resources register ↗",sourceDirectory);
-   put(routes,"p","These are company or shared working Sheets; a link does not prove this specific project has records. Use the correct Project ID when entering data.");
+   put(routes,"p","These are company-wide workbooks. Choose this project within the Sheet before entering a new record.");
    // The drawing repository's public projects.json currently reuses
    // PRJ-000029 for Ramachandra, but canonical A7 assigns it to Basanti.
    // Suppress ambiguous project-ID code searches rather than cross-attach.
    if(p.project_id==="PRJ-000029"){
      const hold=put(pane,"div",null,"project-owned-actions");
-     put(hold,"strong","CAD identity HOLD — do not attach unrelated files");
-     put(hold,"p","The canonical master lists this ID for Basanti Poudel Baral. The separate CAD index lists Ramachandra Devkota under the same ID. Source records and projects must not be merged without formal reconciliation.");
-     link(hold,"Open A7/CAD identity conflict #146 ↗","https://github.com/FabinGurung/jp-drawing-coordination/issues/146");
+     put(hold,"strong","Similar project references — confirmation needed");
+     put(hold,"p","Basanti Poudel Baral and Ramachandra Devkota have a conflicting reference in two separate systems. Keep their documents separate until the office confirms the correct assignment.");
+     link(hold,"See the correction request ↗","https://github.com/FabinGurung/jp-drawing-coordination/issues/146");
    }else{
      const repoSearch=put(pane,"div",null,"project-owned-actions");
-     put(repoSearch,"strong","Search related GitHub engineering repositories");
+     put(repoSearch,"strong","Find related project drawings and calculations");
      const sourceCodeTargets=[
        ["Drawing Coordination", "jp-drawing-coordination"],
        ["Structural Analysis", "jp-structural-analysis"],
@@ -96,10 +96,10 @@
        ["Site Operations", "jp-site-operations"]
      ];
      for(const [label,repo] of sourceCodeTargets){
-       link(repoSearch,label+" — search this project ID ↗",
+       link(repoSearch,"Look for this project in "+label+" ↗",
          "https://github.com/FabinGurung/"+repo+"/search?q="+encodeURIComponent(p.project_id)+"&type=code");
      }
-     put(repoSearch,"p","Exact-ID repository searches, not verified original project folders or engineering approvals. Original CAD/PDF/DWG files open only from source-verified groups above.");
+     put(repoSearch,"p","Results may contain working drafts. The file links above are the ones currently listed by this Library.");
    }
    const u=new URL(location.href);u.searchParams.set("project",p.project_id);history.replaceState(null,"",u);
    document.querySelectorAll(".project-card").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.project===p.project_id)));
@@ -113,10 +113,10 @@
      const btn=put(root,"button",null,"project-card");btn.type="button";btn.setAttribute("role","listitem");btn.dataset.project=p.project_id;
      btn.setAttribute("aria-pressed",String(state.selected===p.project_id));
      const header=put(btn,"div",null,"project-card-heading");
-     put(header,"strong",p.name);put(header,"small",p.project_id);
+     put(header,"strong",p.name);put(header,"small",p.status||"Project");
      const counts=resources(p).length+docs(p).length;
-     put(btn,"span",(p.company_project_code||"Intake")+" · "+p.status,"project-card-meta");
-     put(btn,"span",counts?counts+" reviewed original links":"Original links not yet admitted","project-card-evidence");
+     put(btn,"span",p.company+" · "+p.status,"project-card-meta");
+     put(btn,"span",counts?counts+" available file links":"No files listed yet","project-card-evidence");
      btn.addEventListener("click",()=>details(p));
    }
    if(!projects.length)put(root,"p","No projects match these filters. Change the company or search.", "empty");
@@ -145,12 +145,10 @@
    $("project-total").textContent=list.projects.length;
    $("project-with-files").textContent=state.projects.filter(p=>resources(p).length+docs(p).length>0).length;
    $("source-links").textContent=catalog.resources.length;
-   $("project-provenance").textContent=(list.publication_method==="AUTHENTICATED_DOUBLE_READ__CANONICAL_PROJECTS"?
-    "Current Projects & Locations workbook read twice by Actions.":"Owner-reviewed 18 November snapshot; independent refresh of canonical project Sheet not verified.")+
-    " Drawing links are from the separately reviewed source catalogue, not invented.";
+   $("project-provenance").textContent="Files open in Google Drive. Confirm the latest approved revision before using any drawing for construction.";
    bind();render();details(state.projects.find(x=>x.project_id===saved)||state.projects[0]);
  }).catch(error=>{
-   $("project-provenance").textContent="Project index unavailable; no project or document status can be inferred.";
+   $("project-provenance").textContent="The project list is temporarily unavailable. Open the Projects & Locations Sheet instead.";
    $("project-count").textContent="Source unavailable";
    $("project-cards").replaceChildren(node("p","See the original Projects & Locations Google Sheet for the maintained record.","empty"));
    console.error("Resource project directory load failed",error.message);
