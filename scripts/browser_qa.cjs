@@ -97,7 +97,7 @@ async function qa() {
     assert.equal(await page.locator("#details .source-actions a").count(),3);
     assert.match(await page.locator("#details .source-actions a").first().getAttribute("href"),/jp-estimating-and-boq/);
     await page.locator("#live-catalogue-readback").waitFor();
-    await page.waitForFunction(() => document.getElementById("live-catalogue-readback").textContent.includes("Reviewed catalogue"));
+    await page.waitForFunction(() => document.getElementById("live-catalogue-readback").textContent.includes("Document list updated"));
     await page.goto(ROOT + "/workspaces.html", {waitUntil:"domcontentloaded"});
     assert.equal(await page.locator(".portal-card-primary").count(),2);
     assert.equal(await page.locator('nav[aria-label="Primary resource tabs"] a[href="./field.html"]').count(),1);
