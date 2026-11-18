@@ -16,7 +16,9 @@ SOURCES = {
 }
 ACCESS_MODES = {"PUBLIC_LINK", "DRIVE_PERMISSION_REQUIRED"}
 ADMISSION = {"LEGACY_PUBLIC_ROUTE", "OWNER_REVIEWED_PUBLIC_LINK"}
-SITE_FILES = ("index.html", "app.js", "styles.css", "resources/project-documents.html",
+SITE_FILES = ("index.html", "app.js", "styles.css", "projects.html", "projects.js",
+              "projects-register.baseline.json", "assets/css/project-guide.css",
+              "resources/project-documents.html",
               "operations.html", "operations.css", "operations.js", "source-custody.json",
               "editing.html", "editing.css",
               "workspaces.html", "field.html", "field-payments.js", "money.html", "money.js", "portal.css",
@@ -216,6 +218,12 @@ def build(tables, out, received_at):
         target = out / name
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / "site" / name, target)
+    # Public canonical projects are a separate read-only projection, not newly
+    # manufactured Project Resources file links. Permission failures fall back
+    # to the dated owner-reviewed public identity baseline.
+    from publish_project_directory import publish_project_directory
+    project_count = publish_project_directory(out, received_at)
+    print("Public canonical project directory:", project_count)
     (out / ".nojekyll").touch()
     (out / "catalog.json").write_text(json.dumps({
         "schema_version": "2.0.0", "companies": companies, "projects": projects,
