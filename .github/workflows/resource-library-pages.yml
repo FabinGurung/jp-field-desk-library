@@ -61,6 +61,7 @@ jobs:
         with:
           persist-credentials: false
       - run: node --check site/app.js
+      - run: node --check site/projects.js
       - run: node --check site/operations.js
       - run: node --check site/money.js
       - run: node --check site/field-payments.js
