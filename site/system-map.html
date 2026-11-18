@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Website &amp; Actions Hierarchy · A9 Resources</title>
+<link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./portal.css"><link rel="stylesheet" href="./assets/css/resource-unified.css">
+<style>
+.system-main{max-width:1230px;margin:auto;padding:23px 16px 70px}.system-hero{border-radius:17px;padding:29px;background:linear-gradient(110deg,#e2eee4,#fdfaf0);border:1px solid #d1e3d6}
+.system-hero h1{font-size:clamp(1.8rem,3.5vw,2.9rem);margin:0 0 10px;letter-spacing:-.05em}
+.system-hero p{max-width:870px;color:#4f695b;font-size:.9rem}
+.system-toc{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0}.system-toc a{background:#fff;border:1px solid #cfe1d2;padding:10px 13px;border-radius:9px;text-decoration:none;color:#205c43;font-weight:750;font-size:.82rem}
+.system-card{border:1px solid #d6e2d8;border-radius:14px;background:#fff;padding:clamp(17px,3vw,29px);margin-top:16px}
+.system-card h2{margin:0 0 10px;font-size:1.35rem}.system-card p{font-size:.85rem;color:#526d5c;line-height:1.6}
+.system-card details{border:1px solid #e0e8e0;border-radius:9px;margin:10px 0;background:#fbfdfa}.system-card details summary{cursor:pointer;padding:13px;font-weight:790;font-size:.85rem}.system-card details>div{padding:0 15px 15px}
+.system-card ul{padding-left:22px}.system-card li{font-size:.84rem;margin:7px 0;line-height:1.55}
+.system-card li a{color:#145e43;font-weight:770}
+.system-card code{font-size:.76rem;overflow-wrap:anywhere}
+.system-table{width:100%;border-collapse:collapse;font-size:.8rem}.system-table td,.system-table th{border:1px solid #dfebdf;padding:11px;text-align:left;vertical-align:top}.system-table th{background:#ebf4ec}
+.system-state{font-weight:800;color:#3c6c4c}.system-caution{font-weight:800;color:#8a6635}
+@media(max-width:700px){.system-card{padding:16px}.system-table{display:block;overflow-x:auto}.system-toc{flex-wrap:nowrap;overflow:auto}.system-toc a{white-space:nowrap;flex:0 0 auto}}
+</style></head><body>
+<header class="north"><a class="brand" href="./"><span class="brand-icon">A9</span><span><strong>Field &amp; Desk</strong><small>System hierarchy</small></span></a>
+<nav aria-label="Primary resource tabs"><a href="./projects.html">All Projects</a><a href="./">Drawings &amp; Files</a><a href="./field.html">Field Resources</a><a href="./memory-wall/">Google Sheets</a></nav></header>
+<main class="system-main">
+<section class="system-hero"><p class="eyebrow">A7 / A9 · GOVERNED RESOURCE SYSTEM</p><h1>What exists, what works, what to simplify.</h1>
+<p>This is a navigable inventory of the Resources repository's published pages, source inputs, GitHub Actions and older preservation tooling. Do not delete working history, private evidence or original Sheets to simplify the user interface.</p>
+<p>Repository: <a href="https://github.com/FabinGurung/jp-field-desk-library">FabinGurung/jp-field-desk-library ↗</a> · <a href="https://github.com/FabinGurung/jp-field-desk-library/actions">Actions history ↗</a> · <a href="https://github.com/FabinGurung/jp-field-desk-library/releases">Milestone history ↗</a></p>
+</section>
+<nav class="system-toc" aria-label="Hierarchy contents"><a href="#public-pages">1. Pages</a><a href="#actions">2. Actions</a><a href="#sources">3. Source Sheets</a><a href="#decisions">4. Keep / focus / archive</a><a href="#other-systems">5. Other repositories</a></nav>
+<section id="public-pages" class="system-card"><h2>1. GitHub Pages — public routes</h2><p>Primary work should stay close to the top; operational help and historical routes belong deeper.</p>
+<details open><summary>Primary: project and field work</summary><div><ul>
+<li><a href="./projects.html">All Projects &amp; Files</a> — public canonical project directory with registered source links (new project-first view)</li>
+<li><a href="./">Drawings &amp; Files / Desk</a> — original architecture, structure, CAD, model, report and project packet links</li>
+<li><a href="./field.html">Field Resources</a> — ordered materials → actual work → measurements → attendance → billing owner sequence</li>
+<li><a href="./memory-wall/">Google Sheets Memory Wall</a> — original working Sheet directory, 35 existing staff links</li>
+</ul></div></details>
+<details><summary>Secondary: only when needed</summary><div><ul>
+<li><a href="./money.html">Money &amp; Bills</a> — source-custody explainer, three Estimation owner routes and worker-register boundary</li>
+<li><a href="./operations.html">Operations &amp; Source Custody</a> — source-owner status and clickable approved references; not Site Operations itself</li>
+<li><a href="./editing.html">How to edit</a> — Sheet authority, approval, source revision, A7 PRE/POST, Actions</li>
+<li><a href="./resources/project-documents.html?project=PRJ-000029">Basanti A/B/C project packet viewer</a> — only original, source-linked PDFs with Drive access control</li>
+<li><a href="./feasibility/">Astam Village feasibility</a> · <a href="./feasibility/buyer-guide/">Buyer guide</a> — research and purchase HOLD, not approved design</li>
+</ul></div></details>
+<details><summary>Legacy &amp; internal routes to preserve, not promote</summary><div><ul>
+<li><a href="./workspaces.html">Workspaces</a> — historical landing page; overlap with new main navigation; keep as compatibility URL</li>
+<li><code>site/resources/working-drawings.html</code> — source-file legacy view, not part of the current Pages publication allowlist</li>
+<li><code>site/catalog/public-index.v0.1.json</code> — legacy source index, not a live financial or material ledger</li>
+<li><code>site/ops/data/land-feasibility/</code> — approved public-safe Astam snapshot and guide references</li>
+<li><code>site/assets/</code> — shared theme, styles and botanical assets; not independent task pages</li>
+</ul></div></details></section>
+<section id="actions" class="system-card"><h2>2. GitHub Actions — the actual job tree</h2><p>The main workflow runs at minute 37 each hour (UTC) and also on qualifying pushes, pull requests and manual dispatch. A successful Sheet edit alone does not trigger a real-time push. Historical release jobs are not new source consumers.</p>
+<details open><summary><a href="https://github.com/FabinGurung/jp-field-desk-library/actions/workflows/resource-library-pages.yml">resource-library-pages.yml</a> — main publication and QA</summary><div><ol>
+<li><strong>test</strong> — JavaScript syntax, Python unit tests, synthetic public artifacts</li>
+<li><strong>browser-qa</strong> — Chromium desktop/mobile on PR and pushes (skipped for schedule)</li>
+<li><strong>project</strong> — authorized read-only Google Sheets identity; source-led Desk catalogue, approved historical Payment, public canonical project names if accessible</li>
+<li><strong>deploy</strong> — publish validated GitHub Pages artifact</li>
+<li><strong>scheduled-refresh-assert</strong> — require successful scheduled build and deployed Pages</li>
+<li><strong>release-cutover</strong> — historically gated v1.3.2 release</li>
+<li><strong>release-astam-v1-4</strong> — Astam v1.4.0 source/readback milestone</li>
+<li><strong>release-workspaces-v1-5</strong> — v1.5.0 compatibility milestone</li>
+<li><strong>release-desk-field-v1-6</strong> — Desk/Field split release</li>
+<li><strong>release-clean-payment-v1-7</strong> — historical Payment projection release</li>
+<li><strong>release-scheduled-refresh-v1-7-1</strong> — refresh verification</li>
+<li><strong>release-staff-sheets-v1-8</strong> — original staff Sheets directory</li>
+<li><strong>release-desk-source-v1-8-1</strong> — source-link reconciliation</li>
+<li><strong>release-resource-ux-v1-9</strong> — shared UI and Estimation ownership</li>
+</ol></div></details>
+<details><summary>Separate QA / historical-migration workflows</summary><div><ul>
+<li><a href="https://github.com/FabinGurung/jp-field-desk-library/actions/workflows/a9-gated-preview-qa.yml">a9-gated-preview-qa.yml</a> — preview history gate</li>
+<li><a href="https://github.com/FabinGurung/jp-field-desk-library/actions/workflows/a9-provider-inventory-qa.yml">a9-provider-inventory-qa.yml</a> — provider inventory integrity</li>
+<li><a href="https://github.com/FabinGurung/jp-field-desk-library/actions/workflows/a9-history-transfer-qa.yml">a9-history-transfer-qa.yml</a> — migration preservation QA</li>
+<li><a href="https://github.com/FabinGurung/jp-field-desk-library/actions/workflows/a9-history-transfer.yml">a9-history-transfer.yml</a> — controlled history transfer (not ordinary web publishing)</li>
+</ul></div></details>
+<details><summary>Source publisher scripts and outputs</summary><div><p><code>scripts/sheets_read.py</code> performs read-only authenticated double reads. <code>scripts/publish_library.py</code> validates original Drive references and writes <code>catalog.json</code>, <code>document-packets.json</code>. <code>scripts/publish_field_payments.py</code> owns the separate 958-row historical Payment projection. <code>scripts/publish_project_directory.py</code> generates <code>projects-directory.json</code> from canonical public project identities, or marks its dated fallback explicitly if that Sheet's reader has no access.</p><p>All source evidence remains in Google Drive; generated JSON is derived presentation data, not an editable register.</p></div></details></section>
+<section id="sources" class="system-card"><h2>3. Source → presentation → downstream owner</h2>
+<table class="system-table"><thead><tr><th>Original source</th><th>Current Resources role</th><th>Other owner</th></tr></thead><tbody>
+<tr><td><a href="https://docs.google.com/spreadsheets/d/1e019Jac4lDveZ2glXMph4RLHivqPFEachbcNi-R1DZk/edit">Project Resources LIVE</a></td><td>Authenticated catalogue publisher: 74 reviewed links, 6 packet PDFs</td><td>Field &amp; Desk original ownership</td></tr>
+<tr><td><a href="https://docs.google.com/spreadsheets/d/1JqzjBNBCT_AAIBkuGsIR5VBOJ3_HyifdPDc7K_jF5Bo/edit">Projects &amp; Locations</a></td><td>29 public IDs; 30th retired alias excluded. Optional authenticated project index refresh with explicit dated fallback</td><td>Canonical A7/A9 identity source</td></tr>
+<tr><td><a href="./field.html#materials">Fishtail / Rohini Materials Inventory</a></td><td>Actual consumption and movement recording; source links only until an approved public projection is implemented</td><td>Field and Site Operations</td></tr>
+<tr><td><a href="./field.html#daily-work">Daily Progress / Readiness</a></td><td>Actual vs planned work; no inferred completion</td><td>Site Operations / Notification consumers after approval</td></tr>
+<tr><td><a href="./field.html#measurements">Work Measurement Evidence</a></td><td>Observation provenance; quantities under review</td><td>Cost Estimation for cost/reconciliation</td></tr>
+<tr><td><a href="./field.html#attendance">Attendance</a></td><td>Original staff entry links, no new public person-level feed</td><td>Restricted workforce owners</td></tr>
+<tr><td><a href="https://fabingurung.github.io/jp-estimating-and-boq/finance.html#cost-register-triad">Vendor / Contractor / Project Payments</a></td><td>Link out to approved public-safe derived financial pages; retain original site evidence</td><td>JP Cost Estimation working registers</td></tr>
+</tbody></table></section>
+<section id="decisions" class="system-card"><h2>4. What deserves attention?</h2><table class="system-table"><thead><tr><th>Decision</th><th>Candidate</th><th>Reason</th></tr></thead><tbody>
+<tr><td class="system-state">FOCUS</td><td>All Projects, actual work, material movements, measurements, attendance</td><td>Daily usage and accurate information capture</td></tr>
+<tr><td class="system-state">KEEP</td><td>Original Sheets, Drive files, Desk file browser, Memory Wall, A7 PRE/POST, main Actions build</td><td>Source authority, evidence, audit and public navigation</td></tr>
+<tr><td class="system-state">SIMPLIFY</td><td>Money &amp; Bills, source custody and editing guides</td><td>Make actions clickable; shorten explanations; keep secondary</td></tr>
+<tr><td class="system-caution">HIDE FROM PRIMARY NAV</td><td>Workspaces and outdated overview, unfinished working-drawings route</td><td>Preserve URLs but avoid confusing visitors</td></tr>
+<tr><td class="system-caution">ARCHIVE REVIEW ONLY</td><td>Historic v1.3–v1.9 release jobs; migration workflow after preservation verification</td><td>Preserve tag/commit/source history; simplify Actions only after tests and rollback plan</td></tr>
+</tbody></table><p><strong>Storage policy:</strong> prefer GitHub commit history and lightweight markdown/JSON manifests for code and navigation history; preserve originals and sensitive evidence in restricted Drive. Copying code to Drive does not replace verified Git ancestry, and deleting old code prematurely can break reproducibility.</p></section>
+<section id="other-systems" class="system-card"><h2>5. Other relevant A7/A9 websites</h2><ul>
+<li><a href="https://fabingurung.github.io/jp-site-operations/">JP Site Operations</a> — maps, notifications, daily progress; maintains its own memory/decision wall</li>
+<li><a href="https://fabingurung.github.io/jp-estimating-and-boq/memory-posters.html">JP Cost Estimation Memory Posters</a> — vendor/contractor bills, project payments and derived financial owner directory</li>
+<li><a href="https://fabingurung.github.io/jp-a7-system-registry/memory-wall.html">A7 Memory Wall</a> — repository identity and publishing ownership</li>
+<li><a href="https://github.com/FabinGurung/jp-drawing-coordination">CAD and Drawing Coordination</a> · <a href="https://github.com/FabinGurung/jp-structural-analysis">Structural Analysis</a> — engineering model/code, not a substitute for original issued drawing files</li>
+</ul></section>
+<nav class="page-trail"><a href="./field.html">← Field Records</a><a href="./projects.html">All Projects →</a></nav>
+</main><footer class="south"><div><strong>A9 Resource Library · architecture and pruning map</strong><p>History and original evidence are retained. Only primary UI discoverability changes without source-owner approval.</p></div><div class="foot-links"><a href="https://github.com/FabinGurung/jp-field-desk-library">GitHub repository</a><a href="./memory-wall/">Original Sheets</a></div></footer>
+</body></html>

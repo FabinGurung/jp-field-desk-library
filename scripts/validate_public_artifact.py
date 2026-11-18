@@ -12,6 +12,17 @@ def validate(directory):
     directory = Path(directory)
     catalog = json.loads((directory / "catalog.json").read_text(encoding="utf-8"))
     packets = json.loads((directory / "document-packets.json").read_text(encoding="utf-8"))
+    directory_index = json.loads((directory / "projects-directory.json").read_text(encoding="utf-8"))
+    public_projects = directory_index.get("projects", [])
+    pids = [p.get("project_id") for p in public_projects]
+    if (directory_index.get("schema_version") != "1.0.0"
+            or directory_index.get("no_documents_inferred") is not True
+            or len(public_projects) < 29
+            or len(set(pids)) != len(pids)
+            or "PRJ-000030" in pids
+            or any(not re.fullmatch(r"PRJ-[0-9]{6}", pid or "") for pid in pids)):
+        raise ValueError("Public canonical project directory source validation failed")
+
     wall = (directory / "memory-wall/index.html").read_text(encoding="utf-8")
     links = re.findall(r'href="(https://docs\.google\.com/spreadsheets/d/[A-Za-z0-9_-]+/edit)"', wall)
     if len(links) != 35 or len(set(links)) != 35:

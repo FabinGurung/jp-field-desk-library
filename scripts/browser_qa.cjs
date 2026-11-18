@@ -4,7 +4,11 @@ const assert = require("node:assert/strict");
 const ROOT = process.env.BROWSER_QA_URL || "http://127.0.0.1:8765";
 
 async function qa() {
-  const browser = await chromium.launch({headless: true, args:["--no-sandbox"]});
+  const options = {headless: true, args:["--no-sandbox"]};
+  // Ubuntu Actions runners already carry Google Chrome; use it instead of
+  // re-installing large browser/system-dependency packages on every PR.
+  if (process.env.PLAYWRIGHT_USE_SYSTEM_CHROME === "1") options.channel = "chrome";
+  const browser = await chromium.launch(options);
   try {
     const errors = [];
     const page = await browser.newPage({viewport:{width:1366,height:900},deviceScaleFactor:1});
@@ -66,6 +70,16 @@ async function qa() {
     assert.ok(await page.locator(".sheet-card:visible").count() < 35);
     await page.locator("#sheet-clear").click();
     assert.equal(await page.locator(".sheet-card:visible").count(),35);
+    await page.goto(ROOT + "/projects.html", {waitUntil:"domcontentloaded"});
+    await page.locator(".project-card").first().waitFor();
+    assert.equal(await page.locator(".project-card").count(),29);
+    assert.match(await page.locator("#project-provenance").innerText(),/snapshot|workbook/i);
+    await page.locator("#project-query").fill("Narayani");
+    assert.equal(await page.locator(".project-card").count(),1);
+    await page.locator(".project-card").click();
+    assert.match(await page.locator("#project-detail-body").innerText(),/PRJ-000007/);
+    await page.locator("#clear-project-filters").click();
+    assert.equal(await page.locator(".project-card").count(),29);
     await page.goto(ROOT + "/editing.html", {waitUntil:"domcontentloaded"});
     assert.match(await page.locator("main").innerText(),/project_resources/);
     assert.equal(await page.locator("a[href*='gid=8000011']").count() > 0,true);
@@ -85,14 +99,14 @@ async function qa() {
     assert.equal(await page.locator(".portal-card-primary").count(),2);
     assert.equal(await page.locator('nav[aria-label="Primary resource tabs"] a[href="./field.html"]').count(),1);
     await page.locator('.portal-card-primary[href="./field.html"]').click();
-    assert.match(await page.locator("#fishtail").innerText(),/Worker Money/);
-    assert.match(await page.locator("#rohini").innerText(),/NOT ADMITTED/);
+    assert.match(await page.locator("#fishtail").innerText(),/Materials Inventory/);
+    assert.match(await page.locator("#rohini").innerText(),/Materials Inventory/);
     assert.match(await page.locator("#unassigned").innerText(),/Measurements of works/);
-    assert.equal(await page.locator('a[href*="docs.google.com/spreadsheets/"]').count(),1);
+    assert.ok(await page.locator('a[href*="docs.google.com/spreadsheets/"]').count() >= 10);
     assert.equal(await page.locator('a[href*="drive.google.com/drive/folders/"]').count(),0);
     await page.goto(ROOT + "/workspaces.html", {waitUntil:"domcontentloaded"});
     await page.goto(ROOT + "/field.html", {waitUntil:"domcontentloaded"});
-    await page.locator('#fishtail a[href="./money.html#workforce"]').first().click();
+    await page.locator('#attendance a[href="./money.html#workforce"]').first().click();
     await page.locator("#workforce").waitFor();
     assert.match(await page.locator("#workforce").innerText(),/W01–W21/);
     assert.match(await page.locator("#contractors").innerText(),/Cost Estimation/);
@@ -133,6 +147,10 @@ async function qa() {
     await mobile.goto(ROOT + "/workspaces.html", {waitUntil:"domcontentloaded"});
     const workspaceFit = await mobile.evaluate(() => ({viewport:document.documentElement.clientWidth, scroll:document.documentElement.scrollWidth}));
     assert.ok(workspaceFit.scroll <= workspaceFit.viewport + 2, "Workspaces mobile overflow");
+    await mobile.goto(ROOT + "/projects.html", {waitUntil:"domcontentloaded"});
+    await mobile.locator(".project-card").first().waitFor();
+    const projectFit=await mobile.evaluate(()=>({viewport:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
+    assert.ok(projectFit.scroll<=projectFit.viewport+2,"Project directory mobile overflow");
     await mobile.goto(ROOT + "/field.html", {waitUntil:"domcontentloaded"});
     const fieldFit = await mobile.evaluate(() => ({viewport:document.documentElement.clientWidth, scroll:document.documentElement.scrollWidth}));
     assert.ok(fieldFit.scroll <= fieldFit.viewport + 2, "Field Resources mobile overflow");

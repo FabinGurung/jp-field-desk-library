@@ -14,6 +14,7 @@ on:
       - 'docs/releases/v1.8.0.md'
       - 'docs/releases/v1.8.1.md'
       - 'docs/releases/v1.9.0.md'
+      - 'docs/releases/v2.0.0.md'
       - 'docs/governance/**'
       - 'docs/operations/**'
       - 'README.md'
@@ -33,6 +34,7 @@ on:
       - 'docs/releases/v1.8.0.md'
       - 'docs/releases/v1.8.1.md'
       - 'docs/releases/v1.9.0.md'
+      - 'docs/releases/v2.0.0.md'
       - 'docs/governance/**'
       - 'docs/operations/**'
       - 'README.md'
@@ -50,7 +52,8 @@ permissions:
   contents: read
 concurrency:
   group: a9-field-desk-pages-${{ github.ref }}
-  cancel-in-progress: false
+  # New PR revisions supersede obsolete preview QA; production/scheduled publication stays serialized.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
@@ -61,6 +64,7 @@ jobs:
         with:
           persist-credentials: false
       - run: node --check site/app.js
+      - run: node --check site/projects.js
       - run: node --check site/operations.js
       - run: node --check site/money.js
       - run: node --check site/field-payments.js
@@ -89,7 +93,15 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm install --no-save --no-package-lock --ignore-scripts playwright@1.56.1
-      - run: npx playwright install --with-deps chromium
+      - name: Use system Chrome where available, otherwise install Playwright Chromium
+        shell: bash
+        run: |
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo 'PLAYWRIGHT_USE_SYSTEM_CHROME=1' >> "$GITHUB_ENV"
+            google-chrome --version
+          else
+            npx playwright install --with-deps chromium
+          fi
       - name: Render synthetic, no-credentials browser site
         run: python scripts/build_browser_fixture.py _preview
       - name: Chromium desktop and mobile navigation / links / overflow QA
@@ -574,4 +586,65 @@ jobs:
           else
             gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
               --title 'Field & Desk Library v1.9.0 — Unified UI and Source Ownership' --notes-file "$notes"
+          fi
+
+
+  release-project-field-v2-0:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Verify v2.0.0 project, Field and hierarchy publication against live Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          notes='docs/releases/v2.0.0.md'
+          tag='v2.0.0'
+          if git diff --quiet HEAD^ HEAD -- "$notes"; then
+            echo "No v2.0.0 milestone change in this commit"
+            exit 0
+          fi
+          pages="https://fabingurung.github.io/${GITHUB_REPOSITORY#*/}"
+          for file in projects.html projects.js field.html index.html system-map.html \
+            assets/css/project-guide.css assets/css/field-report.css; do
+            curl -fsS --retry 7 --retry-delay 4 --retry-all-errors "$pages/$file?commit=$GITHUB_SHA" | cmp - "site/$file"
+          done
+          for file in catalog.json document-packets.json projects-directory.json; do
+            curl -fsS --retry 7 --retry-delay 4 --retry-all-errors "$pages/$file?commit=$GITHUB_SHA" > "/tmp/$(basename "$file")"
+          done
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          source=json.loads(Path("/tmp/catalog.json").read_text())
+          packets=json.loads(Path("/tmp/document-packets.json").read_text())
+          directory=json.loads(Path("/tmp/projects-directory.json").read_text())
+          ids=[p["project_id"] for p in directory["projects"]]
+          assert source["schema_version"]=="2.0.0"
+          assert len(source["resources"])==74 and len(source["projects"])==10
+          assert len(packets["documents"])==6
+          assert len(ids)>=29 and len(ids)==len(set(ids)) and "PRJ-000030" not in ids
+          assert directory["no_documents_inferred"] is True
+          assert directory["publication_method"] in (
+            "AUTHENTICATED_DOUBLE_READ__CANONICAL_PROJECTS",
+            "AUTHENTICATED_SOURCE_ACCESS_UNVERIFIED__DATED_FALLBACK",
+            "DATED_OWNER_REVIEWED_FALLBACK"
+          )
+          assert source["source_manifest"]["private_payroll_connected"] is False
+          assert len([x for x in source["resources"] if x["project_id"]=="JPENT-ASTAM-2026-01"])==6
+          print("Resource v2.0.0 live Pages PASS: 29+ public identities, 74 independently admitted resource links, six packet PDFs, explicit project source provenance")
+          PY
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            test "$(git ls-remote origin "refs/tags/$tag" | cut -f1)" = "$GITHUB_SHA"
+          else
+            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title 'Field & Desk Library v2.0.0 — All Projects & Ordered Field Records' --notes-file "$notes"
           fi

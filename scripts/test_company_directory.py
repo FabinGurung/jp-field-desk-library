@@ -155,7 +155,7 @@ class CompanyDirectoryTest(unittest.TestCase):
         field = (ROOT / "site/field.html").read_text()
         workspaces = (ROOT / "site/workspaces.html").read_text()
         self.assertIn('href="./field.html"', desk)
-        self.assertIn('aria-current="page">Desk Resources', desk)
+        self.assertIn('aria-current="page">Drawings &amp; Files', desk)
         self.assertIn('aria-current="page">Field Resources', field)
         for title in ("Worker Money &amp; Goods", "Bills of contractor", "Bills of vendor",
                       "Measurements of works", "Attendance"):
