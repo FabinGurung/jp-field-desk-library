@@ -52,6 +52,21 @@ class ProjectDirectoryTests(unittest.TestCase):
         rows.append(rows[1])
         with self.assertRaisesRegex(ValueError,"duplicate"):
             public_rows(rows)
+    def test_specialist_cad_identity_collision_is_explicit_hold(self):
+        project=(ROOT/"site/projects.html").read_text(encoding="utf-8")
+        script=(ROOT/"site/projects.js").read_text(encoding="utf-8")
+        tree=(ROOT/"site/system-map.html").read_text(encoding="utf-8")
+        self.assertIn("specialist-projects",project)
+        for name in ("ashok-adhikari","harisharan-adhikari",
+                     "ramachandra-devkota","js-buddha-jewelers"):
+            self.assertIn(name,project)
+        self.assertIn("issues/146",project)
+        self.assertIn("issues/146",tree)
+        self.assertIn('if(p.project_id==="PRJ-000029")',script)
+        self.assertIn("CAD identity HOLD",script)
+        # No automatic mapping of the CAD workspace to Basanti originals.
+        self.assertNotIn("ramachandra-devkota",script)
+
     def test_field_layout_has_real_order_and_no_new_financial_ledger(self):
         html=(ROOT/"site/field.html").read_text()
         sections=["start","materials","daily-work","measurements","attendance","unassigned","historical-payments","field-data-flow"]
