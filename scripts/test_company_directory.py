@@ -127,7 +127,7 @@ class CompanyDirectoryTest(unittest.TestCase):
         self.assertIn("Company", html)
         self.assertIn("editing.html", html)
         editing = (ROOT / "site/editing.html").read_text()
-        self.assertIn("is_public=TRUE", editing)
+        self.assertIn("Open Project Resources Google Sheet", editing)
         for name in ("index.html", "editing.html", "operations.html", "resources/project-documents.html"):
             page = (ROOT / "site" / name).read_text()
             self.assertNotIn("github.com/FabinGurung/JP_Field_and_Desk_Resource_Library", page)
@@ -137,7 +137,7 @@ class CompanyDirectoryTest(unittest.TestCase):
         self.assertIn('id="facet-revision"', html)
         self.assertIn('id="facet-approval"', html)
         self.assertIn("@media(max-width:700px)", (ROOT / "site/styles.css").read_text())
-        self.assertIn('resource_source_readback', (ROOT / "site/editing.html").read_text())
+        self.assertIn('Open file information', (ROOT / "site/editing.html").read_text())
         self.assertIn("Project Resources", (ROOT / "site/editing.html").read_text())
         self.assertTrue(company_key("Company A").startswith("display-"))
         self.assertIn(("project-packets", "Agreements & Materials"), GROUPS)
@@ -175,7 +175,7 @@ class CompanyDirectoryTest(unittest.TestCase):
         self.assertIn("not verified as final", money)
         self.assertIn("01_JP", money)
         self.assertNotIn("drive.google.com/drive/folders/", money)
-        self.assertIn("Original worker Money & Goods ledger not connected", (ROOT / "site/operations.js").read_text())
+        self.assertIn("other worker records remain private", (ROOT / "site/operations.js").read_text().lower())
 
 
 if __name__ == "__main__":
