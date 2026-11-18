@@ -18,6 +18,7 @@ ACCESS_MODES = {"PUBLIC_LINK", "DRIVE_PERMISSION_REQUIRED"}
 ADMISSION = {"LEGACY_PUBLIC_ROUTE", "OWNER_REVIEWED_PUBLIC_LINK"}
 SITE_FILES = ("index.html", "app.js", "styles.css", "projects.html", "projects.js",
               "projects-register.baseline.json", "assets/css/project-guide.css",
+              "assets/css/field-report.css", "system-map.html",
               "resources/project-documents.html",
               "operations.html", "operations.css", "operations.js", "source-custody.json",
               "editing.html", "editing.css",
