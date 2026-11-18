@@ -52,7 +52,8 @@ permissions:
   contents: read
 concurrency:
   group: a9-field-desk-pages-${{ github.ref }}
-  cancel-in-progress: false
+  # New PR revisions supersede obsolete preview QA; production/scheduled publication stays serialized.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
