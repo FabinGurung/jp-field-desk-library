@@ -4,7 +4,11 @@ const assert = require("node:assert/strict");
 const ROOT = process.env.BROWSER_QA_URL || "http://127.0.0.1:8765";
 
 async function qa() {
-  const browser = await chromium.launch({headless: true, args:["--no-sandbox"]});
+  const options = {headless: true, args:["--no-sandbox"]};
+  // Ubuntu Actions runners already carry Google Chrome; use it instead of
+  // re-installing large browser/system-dependency packages on every PR.
+  if (process.env.PLAYWRIGHT_USE_SYSTEM_CHROME === "1") options.channel = "chrome";
+  const browser = await chromium.launch(options);
   try {
     const errors = [];
     const page = await browser.newPage({viewport:{width:1366,height:900},deviceScaleFactor:1});
