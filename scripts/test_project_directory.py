@@ -63,7 +63,7 @@ class ProjectDirectoryTests(unittest.TestCase):
         self.assertIn("issues/146",project)
         self.assertIn("issues/146",tree)
         self.assertIn('if(p.project_id==="PRJ-000029")',script)
-        self.assertIn("CAD identity HOLD",script)
+        self.assertIn("Similar project references",script)
         # No automatic mapping of the CAD workspace to Basanti originals.
         self.assertNotIn("ramachandra-devkota",script)
 
