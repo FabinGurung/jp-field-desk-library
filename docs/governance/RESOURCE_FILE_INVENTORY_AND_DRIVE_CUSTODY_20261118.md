@@ -30,7 +30,7 @@ Original drawings were NOT moved into a single universal folder. Their source-ba
 
 ## 19 A9 copies from externally owned Construction Sites files, 14 November 2026
 
-The recorded verification checks were destination parent, name, MIME type, ownership and matching file sizes, **not a full cryptographic hash/revision supersession/engineer-issued-for-construction comparison**. The foreign source originals were left in place. A11 copy release [v1.8.1](https://github.com/FabinGurung/jp-field-desk-library/blob/main/docs/releases/v1.8.1.md) documents this boundary.
+The recorded verification checks were destination parent, name, MIME type, ownership and matching file sizes, **not a full cryptographic hash/revision supersession/engineer-issued-for-construction comparison**. The foreign source originals were left in place. A9 copy release [v1.8.1](https://github.com/FabinGurung/jp-field-desk-library/blob/main/docs/releases/v1.8.1.md) documents this boundary.
 
 | Project | Verified destination folder | Transferred subjects |
 | --- | --- | --- |
