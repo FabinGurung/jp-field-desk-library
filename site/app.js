@@ -37,7 +37,7 @@
     const root = $("record-detail");
     root.replaceChildren();
     if (!r) {
-      text(root, "p", "Choose an individual record to inspect its source and recorded review status.", "soft");
+      text(root, "p", "Select a file to see its type, original name and Google Drive link.", "soft");
       return;
     }
     text(root, "h3", r.title);
@@ -47,18 +47,16 @@
     const related=text(actions,"a","View project directory","detail-project-link"); related.href="./?project="+encodeURIComponent(r.project_id);
     root.append(actions);
     const fields = [
-      ["Project", r.project + " · " + r.project_id],
-      ["Resource group", (state.data.groups.find(g => g.key === r.group) || {}).label || r.group],
-      ["Document slot", r.document_slot || "Not classified"],
-      ["Discipline (source register)", r.discipline || "Not classified"],
+      ["Project", r.project],
+      ["File group", (state.data.groups.find(g => g.key === r.group) || {}).label || "Other files"],
+      ["File category", r.document_slot || "Other files"],
+      ["Drawing discipline", r.discipline || "Not specified"],
       ["Format", r.format],
-      ["Original filename", r.original_filename || "Not provided in source register"],
-      ["Revision / issue note (not an approval)", r.revision_note || "Revision not established"],
-      ["Owner's approval note", r.approval || "Unverified"],
-      ["Source access", r.access === "PUBLIC_LINK" ? "Reviewed link · original access still enforced by Drive" : "Google Drive permission required"],
-      ["Source register", r.origin_tab + " + " + r.readback_tab],
-      ["Owner-entered readback", r.readback_checked_on || "Not supplied"],
-      ["Stable record ID", r.id]
+      ["Original filename", r.original_filename || "Not supplied"],
+      ["Revision status", "Check the title block or original file before construction"],
+      ["Construction status", r.approval === "APPROVED_FOR_CONSTRUCTION" ? "Marked approved in the register — verify the original stamp" : "Not confirmed as an approved construction issue"],
+      ["Access", r.access === "PUBLIC_LINK" ? "Open with existing Google Drive access" : "Google Drive permission required"],
+      ["Files are stored in", "Google Drive"]
     ];
     for (const [label, value] of fields) {
       text(root, "h4", label);
@@ -184,7 +182,7 @@
       const btn = make("button", null, "project-card");
       btn.type = "button";
       text(btn, "strong", p.name);
-      text(btn, "small", p.project_id + (p.company_project_code ? " · " + p.company_project_code : ""));
+      text(btn, "small", "Browse available files");
       text(btn, "small", p.resource_count + " resource links · " + p.document_count + " packet documents");
       btn.addEventListener("click", () => setLocation(c.key, p.project_id));
       grid.append(btn);
@@ -246,10 +244,9 @@
     if (!p) {setLocation(); return;}
     const header = make("div", null, "section-top");
     const left = make("div");
-    text(left, "p", "03 / STANDARD RESOURCE MATRIX", "eyebrow");
+    text(left, "p", "03 / DRAWINGS AND FILES", "eyebrow");
     text(left, "h2", p.name);
-    text(left, "p", p.project_id + (p.company_project_code ? " · " + p.company_project_code : "") +
-      " · " + p.resource_count + " registered resources · " + p.document_count + " packet files");
+    text(left, "p", p.resource_count + " file and folder links · " + p.document_count + " client documents");
     header.append(left);
     const back = text(header,"button","All projects","utility-btn");
     back.addEventListener("click", () => setLocation(state.company));
@@ -279,7 +276,7 @@
       const summ = make("summary");
       text(summ,"span",group.label);
       const recordCount = all.length + (hasPackets ? p.document_count : 0);
-      text(summ,"small",recordCount ? recordCount+" registered" : "No entries");
+      text(summ,"small",recordCount ? recordCount+" listed" : "No files listed");
       groupCard.append(summ);
       const body=make("div",null,"resource-items slots");
       const allSlots=splitIntoSlots(group.key,all);
