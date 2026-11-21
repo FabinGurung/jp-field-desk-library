@@ -1,5 +1,7 @@
 # A9 · Field & Desk Operations Library
 
+**Current Google Drive source locations (21 November 2026):** [Repository-mirrored owners and corrected Sharada/Bishal received files](docs/governance/DRIVE_SOURCE_OWNER_ROUTE_20261121.md). Original live Google Sheet IDs and permissions are unchanged. Earlier release notes below describe their historical folder locations and must not be used as the current folder map.
+
 **Human-facing name:** Field & Desk Operations Library. The live GitHub Pages site uses the `jp-field-desk-library` repository slug.
 
 [Google Sheets for staff](https://fabingurung.github.io/jp-field-desk-library/memory-wall/) · [Company-first Pages directory](https://fabingurung.github.io/jp-field-desk-library/) · [Source custody](https://fabingurung.github.io/jp-field-desk-library/operations.html) · [How to edit](https://fabingurung.github.io/jp-field-desk-library/editing.html)
