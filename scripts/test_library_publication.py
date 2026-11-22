@@ -3,10 +3,22 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from publish_library import build
+from publish_library import build, finalized, verified_file_url
 
 
 class LibraryPublicationTest(unittest.TestCase):
+    def test_issued_status_and_verified_native_drive_links(self):
+        self.assertTrue(finalized("APPROVED_FOR_CONSTRUCTION"))
+        self.assertFalse(finalized("NOT_APPROVED_FOR_CONSTRUCTION"))
+        file_id = "SyntheticApprovedOutput"
+        native = f"https://docs.google.com/document/d/{file_id}/edit?usp=sharing"
+        mime = "application/vnd.google-apps.document"
+        self.assertEqual(verified_file_url(native, file_id, mime), f"https://drive.google.com/file/d/{file_id}/view")
+        with self.assertRaisesRegex(ValueError, "verified Drive file"):
+            verified_file_url(native, "DifferentApprovedOutput", mime)
+        with self.assertRaisesRegex(ValueError, "verified Drive file"):
+            verified_file_url(native, file_id, "application/vnd.google-apps.spreadsheet")
+
     def test_live_sources_keep_project_links_separate_and_gate_drive_targets(self):
         file_id = "synthetic_public_file_id"
         doc_id = "synthetic_document_file_id"

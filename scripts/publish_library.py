@@ -70,13 +70,34 @@ UNASSIGNED_COMPANY = "Company confirmation required"
 
 
 FINAL_STATUSES = {
-    "approved", "approved for issue", "final", "finalized", "finalised",
+    "approved", "approved for construction", "approved for issue", "final", "finalized", "finalised",
     "issued", "issued for construction", "signed",
 }
 
 
 def finalized(value):
     return re.sub(r"[_\s-]+", " ", value.strip().casefold()) in FINAL_STATUSES
+
+
+NATIVE_FILE_PATHS = {
+    "application/vnd.google-apps.document": "document",
+    "application/vnd.google-apps.spreadsheet": "spreadsheets",
+    "application/vnd.google-apps.presentation": "presentation",
+}
+
+
+def verified_file_url(value, file_id, mime_type):
+    original = urlsplit(value)
+    path = f"/file/d/{file_id}/view"
+    if original.scheme != "https":
+        raise ValueError("Resource URL does not match the verified Drive file")
+    if original.netloc == "drive.google.com" and original.path == path:
+        return f"https://drive.google.com{path}"
+    native = NATIVE_FILE_PATHS.get(mime_type)
+    if (original.netloc == "docs.google.com" and native
+            and original.path in {f"/{native}/d/{file_id}/{action}" for action in ("edit", "view", "preview")}):
+        return f"https://drive.google.com{path}"
+    raise ValueError("Resource URL does not match the verified Drive file")
 
 
 def company_key(company):
@@ -152,12 +173,9 @@ def build(tables, out, received_at):
             continue
         source = checked_source(row, "resource_id", receipts, publication_day)
         file_id = source["drive_file_id"]
-        parsed = urlsplit(row["source_url"])
         if source["mime_type"] == "application/vnd.google-apps.folder":
             continue
-        path = f"/file/d/{file_id}/view"
-        if parsed.scheme != "https" or parsed.netloc != "drive.google.com" or parsed.path != path:
-            raise ValueError("Resource URL does not match the verified Drive file")
+        link = verified_file_url(row["source_url"], file_id, source["mime_type"])
         company = row.get("company", "").strip()
         project = ensure_project(row["project_id"], row["project_name"], company,
                                  row.get("company_project_code", ""))
@@ -172,7 +190,7 @@ def build(tables, out, received_at):
             "company_key": project["company_key"], "site": row["site_reference"],
             "format": row["format"], "approval": row["approval_status"],
             "priority": int(row["sort_priority"]), "access": source["access_mode"],
-            "url": f"https://drive.google.com{path}", "readback_checked_on": source["checked_on"],
+            "url": link, "readback_checked_on": source["checked_on"],
             "origin_tab": "project_resources", "readback_tab": "resource_source_readback",
         })
         project["resource_count"] += 1
