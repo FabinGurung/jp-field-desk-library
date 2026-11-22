@@ -1,4 +1,4 @@
-name: A9 Desk Resources — Finalized Files Publisher
+name: A9 Desk Resources — Drive Link Publisher
 on:
   pull_request:
     paths:

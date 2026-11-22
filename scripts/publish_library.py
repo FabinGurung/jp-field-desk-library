@@ -69,16 +69,7 @@ GROUPS = [
 UNASSIGNED_COMPANY = "Company confirmation required"
 
 
-FINAL_STATUSES = {
-    "approved", "approved for construction", "approved for issue", "final", "finalized", "finalised",
-    "issued", "issued for construction", "signed",
-}
-
-
-def finalized(value):
-    return re.sub(r"[_\s-]+", " ", value.strip().casefold()) in FINAL_STATUSES
-
-
+FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"
 NATIVE_FILE_PATHS = {
     "application/vnd.google-apps.document": "document",
     "application/vnd.google-apps.spreadsheet": "spreadsheets",
@@ -86,9 +77,9 @@ NATIVE_FILE_PATHS = {
 }
 
 
-def verified_file_url(value, file_id, mime_type):
+def verified_drive_url(value, file_id, mime_type):
     original = urlsplit(value)
-    path = f"/file/d/{file_id}/view"
+    path = f"/drive/folders/{file_id}" if mime_type == FOLDER_MIME_TYPE else f"/file/d/{file_id}/view"
     if original.scheme != "https":
         raise ValueError("Resource URL does not match the verified Drive file")
     if original.netloc == "drive.google.com" and original.path == path:
@@ -169,13 +160,10 @@ def build(tables, out, received_at):
                        "source_url", "project_id", "project_name", "site_reference",
                        "display_name", "category", "format", "sort_priority", "approval_status",
                        "discipline", "revision_note"):
-        if row["publish"].upper() != "TRUE" or not finalized(row["approval_status"]):
+        if row["publish"].upper() != "TRUE":
             continue
         source = checked_source(row, "resource_id", receipts, publication_day)
-        file_id = source["drive_file_id"]
-        if source["mime_type"] == "application/vnd.google-apps.folder":
-            continue
-        link = verified_file_url(row["source_url"], file_id, source["mime_type"])
+        link = verified_drive_url(row["source_url"], source["drive_file_id"], source["mime_type"])
         company = row.get("company", "").strip()
         project = ensure_project(row["project_id"], row["project_name"], company,
                                  row.get("company_project_code", ""))
@@ -199,7 +187,7 @@ def build(tables, out, received_at):
     for row in records(tables["packets"], "document_id", "publish", "project_id",
                        "company_project_code", "project_name", "locality", "drive_file_id",
                        "role", "language", "title", "version", "pages", "approval"):
-        if row["publish"].upper() != "TRUE" or not finalized(row["approval"]):
+        if row["publish"].upper() != "TRUE":
             continue
         source = checked_source(row, "document_id", receipts, publication_day)
         pid = row["project_id"]

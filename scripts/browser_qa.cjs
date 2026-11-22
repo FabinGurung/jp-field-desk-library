@@ -15,6 +15,8 @@ async function qa() {
     const page = await browser.newPage({viewport:{width:1366,height:900},deviceScaleFactor:1});
     page.on("pageerror", error => errors.push(error.message));
     await page.goto(ROOT + "/", {waitUntil:"domcontentloaded"});
+    assert.equal(await page.getByRole("navigation", {name:"Primary resource tabs"})
+      .locator('[aria-current="page"]').textContent(), "Desk Resources");
     await page.locator(".company-card").first().waitFor();
     assert.equal(await page.locator(".company-card").count(),3);
     assert.equal(await page.locator("#metric-projects").textContent(),"3");
@@ -34,8 +36,8 @@ async function qa() {
     assert.equal(await page.locator("#facet-discipline option").count(), 2);
     await page.locator("#facet-discipline").selectOption({label: "Architecture"});
     await page.locator("#facet-format").selectOption("DWG");
-    await page.locator("#facet-revision").selectOption({label: "Final issue confirmed"});
-    await page.locator("#facet-approval").selectOption("Approved");
+    await page.locator("#facet-revision").selectOption({label: "Drawing approval / revision not verified"});
+    await page.locator("#facet-approval").selectOption({label: "Current issue not verified"});
     assert.equal(await page.locator(".resource-line").count(),1);
     assert.match(await page.locator("#facet-count").innerText(),/1 of 1/);
     await page.locator("#clear-facets").click();
@@ -45,6 +47,7 @@ async function qa() {
     assert.doesNotMatch(await page.locator("#record-detail").innerText(),/Stable record ID|Source register|Owner-entered readback/i);
     assert.match(await page.locator("#record-detail").innerText(),/ARCHITECTURE/i);
     assert.match(await page.locator("#record-detail").innerText(),/REVISION/i);
+    assert.match(await page.locator("#record-detail").innerText(),/Current issue not verified/);
     assert.equal(await page.locator("#record-detail .source-button").count(),1);
     assert.ok((await page.url()).includes("project=PRJ-000001"));
     await page.locator("#breadcrumbs button").first().click();
@@ -66,7 +69,7 @@ async function qa() {
     assert.equal(await page.locator(".project-card").count(),29);
     await page.goto(ROOT + "/editing.html", {waitUntil:"domcontentloaded"});
     assert.match(await page.locator("main").innerText(),/Project Resources Google Sheet/);
-    assert.match(await page.locator("main").innerText(),/record the confirmed final status/);
+    assert.match(await page.locator("main").innerText(),/Record the current issue or approval status/);
     await page.route('https://fabingurung.github.io/jp-estimating-and-boq/**', route =>
       route.fulfill({body: 'Estimation fixture'}));
     await page.goto(ROOT + "/field.html#measurements");

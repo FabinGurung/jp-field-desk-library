@@ -17,11 +17,12 @@
    const value=[r.document_slot,r.discipline,r.category,r.title].join(" ").toLowerCase();
    const fmt=(r.format||"").toUpperCase();
    if(fmt==="FOLDER")return "Original folders";
+   if(["EDB","E2K","SKP","IFC"].includes(fmt))return "3D models & structural analysis";
    if(/architecture/.test(value))return "Architectural files";
    if(/structur|reinforcement|rebar/.test(value))return "Structural files";
    if(/land|plot|survey|geotech|soil/.test(value))return "Land, survey & geotechnical";
    if(/cost|estimate|boq|quantit|calculat/.test(value))return "Estimates & calculations";
-   if(["EDB","E2K","SKP","IFC"].includes(fmt)||/models/.test(value))return "3D models & structural analysis";
+   if(/models/.test(value))return "3D models & structural analysis";
    if(/report/.test(value))return "Reports & other PDF";
    return "Other source files";
  }
@@ -35,7 +36,7 @@
    put(pane,"p",(p.status||"Status not verified")+" · "+p.company,"project-meta");
    if(p.verification&&p.verification!=="VERIFIED")put(pane,"p","Some project details still need confirmation.","project-warning");
    const rs=resources(p),ds=docs(p);
-   put(pane,"p",rs.length+" finalized file links · "+ds.length+" client documents","project-count-note");
+   put(pane,"p",rs.length+" file and folder links · "+ds.length+" client documents","project-count-note");
    const grouped={};for(const r of rs)(grouped[classify(r)] ||= []).push(r);
    if(ds.length)grouped["Agreements & project packets"]=ds.map(d=>({title:d.title+" · "+d.version,url:d.drive_url,format:"PDF",approval:d.approval}));
    for(const family of families){

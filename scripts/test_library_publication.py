@@ -3,21 +3,23 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from publish_library import build, finalized, verified_file_url
+from publish_library import build, verified_drive_url
 
 
 class LibraryPublicationTest(unittest.TestCase):
-    def test_issued_status_and_verified_native_drive_links(self):
-        self.assertTrue(finalized("APPROVED_FOR_CONSTRUCTION"))
-        self.assertFalse(finalized("NOT_APPROVED_FOR_CONSTRUCTION"))
+    def test_verified_drive_links_match_id_and_mime_type(self):
         file_id = "SyntheticApprovedOutput"
+        folder = f"https://drive.google.com/drive/folders/{file_id}"
+        self.assertEqual(verified_drive_url(folder, file_id, "application/vnd.google-apps.folder"), folder)
+        with self.assertRaisesRegex(ValueError, "verified Drive file"):
+            verified_drive_url(folder, file_id, "application/pdf")
         native = f"https://docs.google.com/document/d/{file_id}/edit?usp=sharing"
         mime = "application/vnd.google-apps.document"
-        self.assertEqual(verified_file_url(native, file_id, mime), f"https://drive.google.com/file/d/{file_id}/view")
+        self.assertEqual(verified_drive_url(native, file_id, mime), f"https://drive.google.com/file/d/{file_id}/view")
         with self.assertRaisesRegex(ValueError, "verified Drive file"):
-            verified_file_url(native, "DifferentApprovedOutput", mime)
+            verified_drive_url(native, "DifferentApprovedOutput", mime)
         with self.assertRaisesRegex(ValueError, "verified Drive file"):
-            verified_file_url(native, file_id, "application/vnd.google-apps.spreadsheet")
+            verified_drive_url(native, file_id, "application/vnd.google-apps.spreadsheet")
 
     def test_live_sources_keep_project_links_separate_and_gate_drive_targets(self):
         file_id = "synthetic_public_file_id"
@@ -64,8 +66,11 @@ class LibraryPublicationTest(unittest.TestCase):
                 build(tables, out, "2026-12-20T12:00:00+05:45")
             tables["resources"][1][11] = "UNVERIFIED_AS_CURRENT_ISSUE"
             tables["packets"][1][12] = "Unsigned proposal"
-            self.assertEqual(build(tables, out, "test"), (0, 0))
-            tables["packets"][1][12] = "Signed"
+            self.assertEqual(build(tables, out, "test"), (1, 1))
+            catalog = json.loads((out / "catalog.json").read_text())
+            self.assertEqual(catalog["resources"][0]["approval"], "UNVERIFIED_AS_CURRENT_ISSUE")
+            packet = json.loads((out / "document-packets.json").read_text())
+            self.assertEqual(packet["documents"][0]["approval"], "Unsigned proposal")
             tables["packets"][1][6] = "changed_file_id_123456"
             with self.assertRaisesRegex(ValueError, "matching Drive readback"):
                 build(tables, out, "test")

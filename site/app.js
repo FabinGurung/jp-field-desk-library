@@ -54,7 +54,7 @@
       ["Format", r.format],
       ["Original filename", r.original_filename || "Not supplied"],
       ["Revision status", "Check the title block or original file before construction"],
-      ["Construction status", r.approval === "APPROVED_FOR_CONSTRUCTION" ? "Marked approved in the register — verify the original stamp" : "Not confirmed as an approved construction issue"],
+      ["Recorded issue status", humanLabel("approval", r.approval) || "Status unrecorded"],
       ["Access", r.access === "PUBLIC_LINK" ? "Open with existing Google Drive access" : "Google Drive permission required"],
       ["Files are stored in", "Google Drive"]
     ];
@@ -113,7 +113,10 @@
       };
       return labels[value] || value;
     }
-    if (field === "approval" && value === "UNVERIFIED_AS_CURRENT_ISSUE") return "Current issue not verified";
+    if (field === "approval") {
+      if (value === "UNVERIFIED_AS_CURRENT_ISSUE") return "Current issue not verified";
+      if (value === "APPROVED_FOR_CONSTRUCTION") return "Marked approved for construction in the register";
+    }
     return value;
   };
   const facetsMatch = resource => filterFields.every(([field]) =>
@@ -198,11 +201,11 @@
       ["architectural-dwg", "Architectural drawings · DWG", r => /architecture/i.test(r.discipline) && r.format === "DWG"],
       ["structural-pdf", "Structural drawings · PDF", r => /structur/i.test(r.discipline) && r.format === "PDF"],
       ["structural-dwg", "Structural drawings · DWG", r => /structur/i.test(r.discipline) && r.format === "DWG"],
-      ["other-drawings", "Other issued drawings", r => true]
+      ["other-drawings", "Other drawings", r => true]
     ],
     "models": [
-      ["etabs-e2k", "Structural analysis model · E2K", r => r.format.toUpperCase() === "E2K"],
-      ["etabs-edb", "Structural analysis model · EDB", r => r.format.toUpperCase() === "EDB"],
+      ["etabs-e2k", "ETABS structural model · E2K", r => r.format.toUpperCase() === "E2K"],
+      ["etabs-edb", "ETABS structural model · EDB", r => r.format.toUpperCase() === "EDB"],
       ["sketchup-skp", "3D SketchUp model · SKP", r => r.format.toUpperCase() === "SKP"],
       ["other-models", "Other source models", r => true]
     ],
@@ -304,7 +307,8 @@
             if (r.original_filename && r.original_filename !== r.title) {
               text(btn,"span",r.original_filename,"original-name");
             }
-            text(btn,"span",[r.format,r.access==="PUBLIC_LINK"?"Link reviewed":"Drive permission required"].filter(Boolean).join(" · "));
+            text(btn,"span",[r.format, humanLabel("approval", r.approval),
+              r.access === "DRIVE_PERMISSION_REQUIRED" ? "Drive permission required" : ""].filter(Boolean).join(" · "));
             btn.addEventListener("click",()=>{
               state.selected=r.id; detail(r); render();
               if (window.matchMedia("(max-width:700px)").matches) $("east").scrollIntoView({block:"start",behavior:"auto"});

@@ -1,6 +1,6 @@
 # Desk Resources
 
-The site lists finalized project drawings, models, reports and client packets from the original Google Drive file links in Project Resources LIVE. An eligible row must have an explicit final or approved status, Publish enabled and a matching current Drive readback. See the [editing guide](site/editing.html) for the publication process.
+The site links project drawings, models, reports, source folders and client packets from Project Resources LIVE. Each listed entry has Publish enabled and a matching Drive readback. The site preserves the issue or approval status recorded in the register. See the [editing guide](site/editing.html) for the publication process.
 
 [JP Cost Estimation](https://fabingurung.github.io/jp-estimating-and-boq/field.html) now owns the working Field Resources pages and historical Payment publication. The former Field Resources and Money bookmarks redirect to the current owner.
 
