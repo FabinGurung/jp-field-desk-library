@@ -21,7 +21,7 @@ class ProjectDirectoryTests(unittest.TestCase):
         self.assertEqual(sum(p["company_id"]=="ORG-000002" for p in projects),2)
         self.assertTrue(all(p["name"] and p["project_id"].startswith("PRJ-") for p in projects))
         for f in ("projects.html","projects.js","assets/css/project-guide.css",
-                  "projects-register.baseline.json","assets/css/field-report.css",
+                  "projects-register.baseline.json",
                   "system-map.html"):
             self.assertIn(f,SITE_FILES)
     def test_explicit_dated_fallback_when_no_source_viewer(self):
@@ -67,16 +67,6 @@ class ProjectDirectoryTests(unittest.TestCase):
         # No automatic mapping of the CAD workspace to Basanti originals.
         self.assertNotIn("ramachandra-devkota",script)
 
-    def test_field_layout_has_real_order_and_no_new_financial_ledger(self):
-        html=(ROOT/"site/field.html").read_text()
-        sections=["start","materials","daily-work","measurements","attendance","unassigned","historical-payments","field-data-flow"]
-        self.assertEqual([html.index('id="'+x+'"') for x in sections],sorted(html.index('id="'+x+'"') for x in sections))
-        self.assertIn('class="field-toc"',html)
-        self.assertIn('id="payment-record-body"',html)
-        self.assertIn("does not establish opening stock",html)
-        self.assertIn("1YshLrDAJDg3CO8F1jmIr2Eucy0-TKwiviVNF5tiAfT0",html)
-        self.assertIn("1GQQDRg3bDPVIrfs1oVm_ycmyBE5NlpxEKzu1DsAz6tk",html)
-        self.assertNotIn("drive.google.com/drive/folders/",html)
 
 if __name__=="__main__":
     unittest.main()

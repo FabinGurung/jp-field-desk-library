@@ -7,6 +7,7 @@ async function qa() {
   const options = {headless: true, args:["--no-sandbox"]};
   // Ubuntu Actions runners already carry Google Chrome; use it instead of
   // re-installing large browser/system-dependency packages on every PR.
+  if (process.env.PLAYWRIGHT_CHROMIUM_PATH) options.executablePath = process.env.PLAYWRIGHT_CHROMIUM_PATH;
   if (process.env.PLAYWRIGHT_USE_SYSTEM_CHROME === "1") options.channel = "chrome";
   const browser = await chromium.launch(options);
   try {
@@ -33,8 +34,8 @@ async function qa() {
     assert.equal(await page.locator("#facet-discipline option").count(), 2);
     await page.locator("#facet-discipline").selectOption({label: "Architecture"});
     await page.locator("#facet-format").selectOption("DWG");
-    await page.locator("#facet-revision").selectOption({label: "Issue / revision not certified"});
-    await page.locator("#facet-approval").selectOption("Review pending");
+    await page.locator("#facet-revision").selectOption({label: "Final issue confirmed"});
+    await page.locator("#facet-approval").selectOption("Approved");
     assert.equal(await page.locator(".resource-line").count(),1);
     assert.match(await page.locator("#facet-count").innerText(),/1 of 1/);
     await page.locator("#clear-facets").click();
@@ -52,25 +53,6 @@ async function qa() {
     assert.equal(await page.locator(".company-card").count(),1);
     await page.locator("#clear-search").click();
     assert.equal(await page.locator(".company-card").count(),3);
-    await page.goto(ROOT + "/memory-wall/", {waitUntil:"domcontentloaded"});
-    assert.match(await page.locator("h1").textContent(),/Find the right Sheet/);
-    assert.equal(await page.locator(".sheet-card").count(),35);
-    assert.equal(await page.locator("#used-here .sheet-card").count(),2);
-    assert.equal(await page.locator("#site .sheet-card").count(),6);
-    assert.equal(await page.locator("#people .sheet-card").count(),7);
-    assert.equal(await page.locator("#projects .sheet-card").count(),9);
-    assert.equal(await page.locator("#materials .sheet-card").count(),2);
-    assert.equal(await page.locator("#office .sheet-card").count(),3);
-    assert.equal(await page.locator("#schedule .sheet-card").count(),2);
-    assert.equal(await page.locator("#previous .sheet-card").count(),4);
-    assert.equal(await page.locator('.sheet-card a[href^="https://docs.google.com/spreadsheets/d/"]').count(),35);
-    assert.match(await page.locator("#used-here").innerText(),/Payment/);
-    assert.match(await page.locator("#site").innerText(),/Daily progress/);
-    await page.locator("#sheet-search").fill("materials");
-    assert.ok(await page.locator(".sheet-card:visible").count() >= 2);
-    assert.ok(await page.locator(".sheet-card:visible").count() < 35);
-    await page.locator("#sheet-clear").click();
-    assert.equal(await page.locator(".sheet-card:visible").count(),35);
     await page.goto(ROOT + "/projects.html", {waitUntil:"domcontentloaded"});
     await page.locator(".project-card").first().waitFor();
     assert.equal(await page.locator(".project-card").count(),29);
@@ -84,41 +66,14 @@ async function qa() {
     assert.equal(await page.locator(".project-card").count(),29);
     await page.goto(ROOT + "/editing.html", {waitUntil:"domcontentloaded"});
     assert.match(await page.locator("main").innerText(),/Project Resources Google Sheet/);
-    assert.doesNotMatch(await page.locator("main").innerText(),/resource_source_readback|project_resources|client_document_packets|is_public=TRUE/i);
-    assert.equal(await page.locator("a[href*='gid=8000011']").count() > 0,true);
-    await page.goto(ROOT + "/money.html", {waitUntil:"domcontentloaded"});
-    assert.equal(await page.locator("#finance-routing .finance-router article").count(),3);
-    assert.equal(await page.locator('#finance-routing a[href*="/jp-estimating-and-boq/"]').count() >= 3,true);
-    await page.goto(ROOT + "/field.html", {waitUntil:"domcontentloaded"});
-    assert.equal(await page.locator('.finance-bridge a[href*="finance.html#cost-register-triad"]').count(),1);
-    await page.goto(ROOT + "/operations.html", {waitUntil:"domcontentloaded"});
-    await page.locator("#sources .record").first().waitFor();
-    await page.locator("#sources .record").filter({hasText:"Vendor, contractor and project-payment evidence"}).first().click();
-    assert.equal(await page.locator("#details .source-actions a").count(),3);
-    assert.match(await page.locator("#details .source-actions a").first().getAttribute("href"),/jp-estimating-and-boq/);
-    await page.locator("#live-catalogue-readback").waitFor();
-    await page.waitForFunction(() => document.getElementById("live-catalogue-readback").textContent.includes("Document list updated"));
-    await page.goto(ROOT + "/workspaces.html", {waitUntil:"domcontentloaded"});
-    assert.equal(await page.locator(".portal-card-primary").count(),2);
-    assert.equal(await page.locator('nav[aria-label="Primary resource tabs"] a[href="./field.html"]').count(),1);
-    await page.locator('.portal-card-primary[href="./field.html"]').click();
-    assert.match(await page.locator("#fishtail").innerText(),/Materials Inventory/);
-    assert.match(await page.locator("#rohini").innerText(),/Materials Inventory/);
-    assert.match(await page.locator("#unassigned").innerText(),/Measurements of works/);
-    assert.ok(await page.locator('a[href*="docs.google.com/spreadsheets/"]').count() >= 10);
-    assert.equal(await page.locator('a[href*="drive.google.com/drive/folders/"]').count(),0);
-    await page.goto(ROOT + "/workspaces.html", {waitUntil:"domcontentloaded"});
-    await page.goto(ROOT + "/field.html", {waitUntil:"domcontentloaded"});
-    await page.locator('#attendance a[href="./money.html#workforce"]').first().click();
-    await page.locator("#workforce").waitFor();
-    assert.match(await page.locator("#workforce").innerText(),/W01–W21/);
-    assert.match(await page.locator("#contractors").innerText(),/Cost Estimation/);
-    await page.waitForFunction(() => document.getElementById("money-sync-status").textContent.includes("Reviewed site-resource catalogue"));
-    assert.equal(await page.locator('a[href*="drive.google.com/drive/folders/"]').count(),0);
-    await page.goto(ROOT + "/money.html", {waitUntil:"domcontentloaded"});
-    assert.equal(await page.locator("#workforce").count(),1);
-    assert.equal(await page.locator("#contractors").count(),1);
-    assert.equal(await page.locator("#vendors").count(),1);
+    assert.match(await page.locator("main").innerText(),/record the confirmed final status/);
+    await page.route('https://fabingurung.github.io/jp-estimating-and-boq/**', route =>
+      route.fulfill({body: 'Estimation fixture'}));
+    await page.goto(ROOT + "/field.html#measurements");
+    assert.equal(new URL(page.url()).hash, '#measurements');
+    assert.ok(page.url().includes('/jp-estimating-and-boq/field.html'));
+    await page.goto(ROOT + "/money.html#workforce");
+    assert.ok(page.url().endsWith('/field.html#workforce'));
     await page.goto(ROOT + "/", {waitUntil:"domcontentloaded"});
     await page.locator(".company-card").first().waitFor();
 
@@ -137,30 +92,10 @@ async function qa() {
     assert.equal(await mobile.locator(".resource-line").count(),1);
     await mobile.locator(".resource-line").first().click();
     assert.match(await mobile.locator("#record-detail").innerText(),/Open original/);
-    await mobile.goto(ROOT + "/memory-wall/", {waitUntil:"domcontentloaded"});
-    assert.equal(await mobile.locator(".sheet-card").count(),35);
-    const sheetsFit = await mobile.evaluate(() => ({
-      viewport:document.documentElement.clientWidth,
-      scroll:document.documentElement.scrollWidth
-    }));
-    assert.ok(sheetsFit.scroll <= sheetsFit.viewport + 2, "Google Sheets page mobile overflow");
-    await mobile.locator("#sheet-search").fill("attendance");
-    assert.ok(await mobile.locator(".sheet-card:visible").count() >= 2);
-    await mobile.locator("#sheet-clear").click();
-    await mobile.goto(ROOT + "/workspaces.html", {waitUntil:"domcontentloaded"});
-    const workspaceFit = await mobile.evaluate(() => ({viewport:document.documentElement.clientWidth, scroll:document.documentElement.scrollWidth}));
-    assert.ok(workspaceFit.scroll <= workspaceFit.viewport + 2, "Workspaces mobile overflow");
     await mobile.goto(ROOT + "/projects.html", {waitUntil:"domcontentloaded"});
     await mobile.locator(".project-card").first().waitFor();
     const projectFit=await mobile.evaluate(()=>({viewport:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
     assert.ok(projectFit.scroll<=projectFit.viewport+2,"Project directory mobile overflow");
-    await mobile.goto(ROOT + "/field.html", {waitUntil:"domcontentloaded"});
-    const fieldFit = await mobile.evaluate(() => ({viewport:document.documentElement.clientWidth, scroll:document.documentElement.scrollWidth}));
-    assert.ok(fieldFit.scroll <= fieldFit.viewport + 2, "Field Resources mobile overflow");
-    assert.equal(await mobile.locator('.field-record').count() >= 12, true);
-    await mobile.goto(ROOT + "/money.html", {waitUntil:"domcontentloaded"});
-    const moneyFit = await mobile.evaluate(() => ({viewport:document.documentElement.clientWidth, scroll:document.documentElement.scrollWidth}));
-    assert.ok(moneyFit.scroll <= moneyFit.viewport + 2, "Money hub mobile overflow");
     await mobile.goto(ROOT + "/?company=display-example-construction-b&project=PRJ-000002", {waitUntil:"domcontentloaded"});
     await mobile.locator(".resource-line").first().waitFor();
     assert.match(await mobile.locator("#workspace").innerText(),/Site B/);

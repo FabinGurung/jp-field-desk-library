@@ -1,3 +1,11 @@
+# Desk Resources
+
+The site lists finalized project drawings, models, reports and client packets from the original Google Drive file links in Project Resources LIVE. An eligible row must have an explicit final or approved status, Publish enabled and a matching current Drive readback. See the [editing guide](site/editing.html) for the publication process.
+
+[JP Cost Estimation](https://fabingurung.github.io/jp-estimating-and-boq/field.html) now owns the working Field Resources pages and historical Payment publication. The former Field Resources and Money bookmarks redirect to the current owner.
+
+## Earlier releases
+
 # A9 · Field & Desk Operations Library
 
 **Current Google Drive source locations (21 November 2026):** [Repository-mirrored owners and corrected Sharada/Bishal received files](docs/governance/DRIVE_SOURCE_OWNER_ROUTE_20261121.md). Original live Google Sheet IDs and permissions are unchanged. Earlier release notes below describe their historical folder locations and must not be used as the current folder map.
