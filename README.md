@@ -8,7 +8,7 @@ The site links project drawings, models, reports, source folders and client pack
 
 # A9 · Field & Desk Operations Library
 
-**Current Google Drive source locations (21 November 2026):** [Repository-mirrored owners and corrected Sharada/Bishal received files](docs/governance/DRIVE_SOURCE_OWNER_ROUTE_20261121.md). Original live Google Sheet IDs and permissions are unchanged. Earlier release notes below describe their historical folder locations and must not be used as the current folder map.
+**Current Google Drive source locations (22 November 2026)** are listed in the [project gallery and source custody guide](docs/governance/DRIVE_SOURCE_OWNER_ROUTE_20261121.md). The original Project Resources LIVE workbook retains its ID and access. The release notes below record earlier locations.
 
 **Human-facing name:** Field & Desk Operations Library. The live GitHub Pages site uses the `jp-field-desk-library` repository slug.
 

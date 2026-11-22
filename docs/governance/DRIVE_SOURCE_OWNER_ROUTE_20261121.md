@@ -1,5 +1,11 @@
 # Resources — Live Google Drive Source Locations (21 November 2026)
 
+## 22 November 2026 — Project galleries under Desk Resources
+
+The Desk Resources Drive folder now owns the original Fishtail Builders and Rohini Engineering and Builders project galleries alongside JP Enterprise. Existing project and file URLs stay valid. Fishtail's existing evidence collections sit under Fishtail Builders alongside its Projects tree. The [01_JP start guide](https://docs.google.com/document/d/1h-1tHUsw8d5GFSMTV1X5JFFERAYeK4jMylp9-nw-jlc/edit) has the current navigation.
+
+Drawing Coordination keeps its standards and the editable Plot 150 SVG and Three.js source Docs. The Desk publisher still reads the original Project Resources LIVE workbook, and Field Resources is served by [JP Cost Estimation](https://fabingurung.github.io/jp-estimating-and-boq/field.html). The locations and publishing arrangements described below are the 21 November record.
+
 This document supersedes **location-only** descriptions in older release notes and the 18 November tree. Those historical source receipts remain accurate for their dates and are not rewritten. **No original PDF/DWG/SKP/EDB content or editable Google Sheet data was changed by this folder operation.**
 
 **Repository source library:** [jp-field-desk-library in 01_JP / 09 GitHub Repositories](https://drive.google.com/drive/folders/19WXVNorL-9FjCMtYrCsgTBww88GVQHDE).
