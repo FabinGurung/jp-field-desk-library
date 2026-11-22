@@ -27,9 +27,9 @@ def sample():
                 f"https://drive.google.com/file/d/{fid}/view")
         resources.append([rid, True, fid, link, pid, "Site " + rid[-1], "S-01", "Source " + rid[-1],
                           "source_folders" if fmt == "FOLDER" else "source_models", fmt, 1,
-                          "Approved", owner, slot,
+                          "UNVERIFIED_AS_CURRENT_ISSUE" if fmt == "DWG" else "Approved", owner, slot,
                           "Architecture" if fmt == "DWG" else "Source file folder",
-                          "Final issue confirmed"])
+                          "NOT_VERIFIED_AS_APPROVED_CONSTRUCTION_DRAWING" if fmt == "DWG" else "Final issue confirmed"])
         receipts.append([rid, fid, "application/vnd.google-apps.folder" if fmt == "FOLDER" else
                          "application/dwg", "2026-11-09T06:00:00Z", "DRIVE_PERMISSION_REQUIRED",
                          "2026-11-09", "LEGACY_PUBLIC_ROUTE"])
@@ -66,7 +66,7 @@ class CompanyDirectoryTest(unittest.TestCase):
             self.assertEqual(catalog["resources"][0]["group"], "drawings")
             self.assertEqual(catalog["resources"][1]["group"], "drawings")
             self.assertEqual(catalog["resources"][0]["discipline"], "Architecture")
-            self.assertEqual(catalog["resources"][0]["revision_note"], "Final issue confirmed")
+            self.assertEqual(catalog["resources"][0]["revision_note"], "NOT_VERIFIED_AS_APPROVED_CONSTRUCTION_DRAWING")
             self.assertEqual(catalog["source_manifest"]["tabs_fetched"], [
                 "project_resources", "client_document_packets", "resource_source_readback"])
             self.assertFalse(catalog["source_manifest"]["private_payroll_connected"])
@@ -136,7 +136,7 @@ class CompanyDirectoryTest(unittest.TestCase):
         self.assertIn('id="facet-revision"', html)
         self.assertIn('id="facet-approval"', html)
         self.assertIn("@media(max-width:700px)", (ROOT / "site/styles.css").read_text())
-        self.assertIn('Record approval and confirm the link', (ROOT / "site/editing.html").read_text())
+        self.assertIn('Record issue status and confirm the link', (ROOT / "site/editing.html").read_text())
         self.assertIn("Project Resources", (ROOT / "site/editing.html").read_text())
         self.assertTrue(company_key("Company A").startswith("display-"))
         self.assertIn(("project-packets", "Agreements & Materials"), GROUPS)
@@ -154,7 +154,7 @@ class CompanyDirectoryTest(unittest.TestCase):
         field = (ROOT / "site/field.html").read_text()
         workspaces = (ROOT / "site/workspaces.html").read_text()
         self.assertNotIn('href="./field.html"', desk)
-        self.assertIn('aria-current="page">Finalized Files', desk)
+        self.assertIn('aria-current="page">Desk Resources', desk)
         self.assertIn('/jp-estimating-and-boq/field.html', field)
         self.assertIn('href="./"', workspaces)
         self.assertNotIn('docs.google.com/spreadsheets', field)

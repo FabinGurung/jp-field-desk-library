@@ -5,9 +5,8 @@ import re
 from collections import Counter
 from pathlib import Path
 
-from publish_library import finalized
-
-URL = re.compile(r"^https://drive\.google\.com/(?:file/d/[A-Za-z0-9_-]+/view|drive/folders/[A-Za-z0-9_-]+)$")
+DRIVE_FILE = re.compile(r"https://drive\.google\.com/file/d/[A-Za-z0-9_-]+/view")
+DRIVE_FOLDER = re.compile(r"https://drive\.google\.com/drive/folders/[A-Za-z0-9_-]+")
 
 
 def validate(directory):
@@ -48,8 +47,8 @@ def validate(directory):
     packet_counts = Counter()
     ids = set()
     for r in catalog["resources"]:
-        if (r["id"] in ids or not URL.fullmatch(r["url"]) or "/drive/folders/" in r["url"]
-                or r.get("kind") != "desk" or not finalized(r["approval"])):
+        if (r["id"] in ids or r.get("kind") != "desk"
+                or not (DRIVE_FILE.fullmatch(r["url"]) or DRIVE_FOLDER.fullmatch(r["url"]))):
             raise ValueError("Duplicate or invalid public resource")
         ids.add(r["id"])
         if r["group"] not in groups or r["project_id"] not in projects:
@@ -61,7 +60,7 @@ def validate(directory):
             raise ValueError("Unproven published row")
         resource_counts[r["project_id"]] += 1
     for d in packets["documents"]:
-        if d["project_id"] not in projects or d["document_id"] in ids or not URL.fullmatch(d["drive_url"]) or not finalized(d["approval"]):
+        if d["project_id"] not in projects or d["document_id"] in ids or not DRIVE_FILE.fullmatch(d["drive_url"]):
             raise ValueError("Broken packet identity")
         ids.add(d["document_id"])
         packet_counts[d["project_id"]] += 1

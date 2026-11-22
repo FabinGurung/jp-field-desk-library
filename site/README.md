@@ -1,3 +1,3 @@
 # Desk Resources site
 
-The publisher reads Project Resources LIVE and links the original Drive files for approved or finalized entries. The original files and the catalogue remain under their existing Drive access controls. Legacy Field Resources URLs direct readers to JP Cost Estimation.
+The publisher reads Project Resources LIVE and links original Drive files and folders with Publish enabled and a matching source record. Each entry retains its recorded status. Google Drive controls access to the originals. Legacy Field Resources URLs direct readers to JP Cost Estimation.
