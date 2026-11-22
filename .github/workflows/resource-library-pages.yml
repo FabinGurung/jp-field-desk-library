@@ -1,4 +1,4 @@
-name: A9 Field & Desk — Source-Backed Directory Publisher
+name: A9 Desk Resources — Finalized Files Publisher
 on:
   pull_request:
     paths:
@@ -65,10 +65,7 @@ jobs:
           persist-credentials: false
       - run: node --check site/app.js
       - run: node --check site/projects.js
-      - run: node --check site/operations.js
-      - run: node --check site/money.js
-      - run: node --check site/field-payments.js
-      - run: node --check site/memory-wall/sheets.js
+      - run: node --check site/legacy-route.js
       - run: node --check scripts/browser_qa.cjs
       - run: python -m unittest discover -s scripts -p 'test_*.py' -v
       - name: Validate synthetic public artifact

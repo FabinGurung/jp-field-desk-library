@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="View project agreements, original drawings and materials schedules in Nepali and English.">
-<title>Project Documents · Field &amp; Desk Operations Library</title>
+<title>Project Documents · Desk Resources Project Library</title>
 <style>
 :root{--paper:#f4f8f0;--ink:#19392e;--muted:#4d6657;--line:#d3e2d4;--accent:#176c4e}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -29,7 +29,7 @@ a{color:var(--accent)}button{font:inherit;cursor:pointer}button:focus-visible,a:
 <link rel="stylesheet" href="../assets/css/resource-unified.css"></head>
 <body>
 <div class="shell">
-<nav class="nav" aria-label="Site navigation"><a href="../projects.html">All Projects</a><a href="../">Drawings &amp; Files</a><a href="../field.html">Field Resources</a><a href="../memory-wall/">Google Sheets</a><a href="../editing.html">How to Edit</a></nav>
+<nav class="nav" aria-label="Site navigation"><a href="../projects.html">All Projects</a><a href="../">Finalized Files</a><a href="../editing.html">How to Edit</a></nav>
 <header class="hero"><div class="eyebrow">FIELD &amp; DESK · PROJECT FILES</div>
 <h1 id="project-name">Project documents</h1>
 <p>Review listed agreements, original drawing sheets, and material schedules in Nepali or English. Check the signed agreement or approved drawing before relying on any version.</p>
@@ -43,7 +43,7 @@ a{color:var(--accent)}button{font:inherit;cursor:pointer}button:focus-visible,a:
 <div class="frame-wrap"><p id="preview-title" class="preview-title">Select a PDF to preview.</p><p class="hint">This preview is served by Google Drive under its normal permission controls. The website does not publish or duplicate the original PDF bytes.</p>
 <iframe id="preview" title="Selected project document preview" loading="lazy" referrerpolicy="no-referrer"></iframe></div></section>
 </main>
-<nav class="page-trail" aria-label="Previous and next Library areas"><a id="back-to-project" href="../">← Project in Desk</a><a href="../field.html">Field source records →</a></nav><footer class="footer"><p>Original project documents stay in Google Drive. Confirm the latest signed and approved issue before construction.</p><a href="../">All projects</a><a href="https://fabingurung.github.io/jp-site-operations/">Communication &amp; Web</a></footer>
+<nav class="page-trail" aria-label="Previous and next Library areas"><a id="back-to-project" href="../">← Project in Desk</a></nav><footer class="footer"><p>Original project documents stay in Google Drive. Confirm the latest signed and approved issue before construction.</p><a href="../">All projects</a><a href="https://fabingurung.github.io/jp-site-operations/">Communication &amp; Web</a></footer>
 </div>
 <script>
 (()=>{"use strict";
@@ -54,7 +54,7 @@ const projectId=new URLSearchParams(location.search).get("project")||"";let lang
 const node=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;};
 function verified(d){return /^https:\/\/drive\.google\.com\/file\/d\/[a-zA-Z0-9_-]+\/view$/.test(d.drive_url)&&d.drive_url.includes("/"+d.drive_file_id+"/");}
 function preview(d,jump=true){if(!verified(d))return;const frame=$("preview");frame.src=d.drive_url.replace("/view","/preview");frame.title="PDF preview: "+d.title;$("preview-title").textContent=d.title+" · "+d.version;$("open-preview").href=d.drive_url;$("open-preview").hidden=false;if(jump)frame.scrollIntoView({behavior:"smooth",block:"nearest"});}
-function list(){const p=data.projects.find(x=>x.project_id===projectId);if(!p){$("document-list").replaceChildren(node("p","empty","No documents listed here. Check the original project folder."));return;}
+function list(){const p=data.projects.find(x=>x.project_id===projectId);if(!p){$("document-list").replaceChildren(node("p","empty","No documents listed here. Ask the document owner about the final issue."));return;}
 $("project-name").textContent=p.name+" — Documents";$("project-code").textContent="Agreements and drawings";
 $("load-status").textContent="Document list updated";
 $("ne").setAttribute("aria-pressed",String(lang==="ne"));$("en").setAttribute("aria-pressed",String(lang==="en"));

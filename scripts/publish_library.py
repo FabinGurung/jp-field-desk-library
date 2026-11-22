@@ -18,12 +18,12 @@ ACCESS_MODES = {"PUBLIC_LINK", "DRIVE_PERMISSION_REQUIRED"}
 ADMISSION = {"LEGACY_PUBLIC_ROUTE", "OWNER_REVIEWED_PUBLIC_LINK"}
 SITE_FILES = ("index.html", "app.js", "styles.css", "projects.html", "projects.js",
               "projects-register.baseline.json", "assets/css/project-guide.css",
-              "assets/css/field-report.css", "system-map.html",
+              "system-map.html",
               "resources/project-documents.html",
-              "operations.html", "operations.css", "operations.js", "source-custody.json",
+              "operations.html", "legacy-route.js",
               "editing.html", "editing.css",
-              "workspaces.html", "field.html", "field-payments.js", "money.html", "money.js", "portal.css",
-              "memory-wall/index.html", "memory-wall/sheets.css", "memory-wall/sheets.js",
+              "workspaces.html", "field.html", "money.html", "portal.css",
+              "memory-wall/index.html",
               "feasibility/index.html", "feasibility/buyer-guide/index.html",
               "feasibility/buyer-guide/guide.json",
               "ops/data/land-feasibility/astam-village-public.v1.0.json",
@@ -67,6 +67,16 @@ GROUPS = [
     ("other", "Other References"),
 ]
 UNASSIGNED_COMPANY = "Company confirmation required"
+
+
+FINAL_STATUSES = {
+    "approved", "approved for issue", "final", "finalized", "finalised",
+    "issued", "issued for construction", "signed",
+}
+
+
+def finalized(value):
+    return re.sub(r"[_\s-]+", " ", value.strip().casefold()) in FINAL_STATUSES
 
 
 def company_key(company):
@@ -138,23 +148,23 @@ def build(tables, out, received_at):
                        "source_url", "project_id", "project_name", "site_reference",
                        "display_name", "category", "format", "sort_priority", "approval_status",
                        "discipline", "revision_note"):
-        if row["publish"].upper() != "TRUE":
+        if row["publish"].upper() != "TRUE" or not finalized(row["approval_status"]):
             continue
         source = checked_source(row, "resource_id", receipts, publication_day)
         file_id = source["drive_file_id"]
         parsed = urlsplit(row["source_url"])
-        folder = source["mime_type"] == "application/vnd.google-apps.folder"
-        path = f"/drive/folders/{file_id}" if folder else f"/file/d/{file_id}/view"
+        if source["mime_type"] == "application/vnd.google-apps.folder":
+            continue
+        path = f"/file/d/{file_id}/view"
         if parsed.scheme != "https" or parsed.netloc != "drive.google.com" or parsed.path != path:
             raise ValueError("Resource URL does not match the verified Drive file")
         company = row.get("company", "").strip()
         project = ensure_project(row["project_id"], row["project_name"], company,
                                  row.get("company_project_code", ""))
         group = resource_group(row)
-        kind = "desk" if row["category"] in {"calculations_and_support", "source_folders"} else "field"
         resources.append({
             "id": row["resource_id"], "title": row["display_name"],
-            "kind": kind, "group": group, "category": row["category"],
+            "kind": "desk", "group": group, "category": row["category"],
             "discipline": row["discipline"], "revision_note": row["revision_note"],
             "original_filename": row.get("original_filename", ""),
             "document_slot": row.get("document_slot", ""), "project_id": row["project_id"],
@@ -171,7 +181,7 @@ def build(tables, out, received_at):
     for row in records(tables["packets"], "document_id", "publish", "project_id",
                        "company_project_code", "project_name", "locality", "drive_file_id",
                        "role", "language", "title", "version", "pages", "approval"):
-        if row["publish"].upper() != "TRUE":
+        if row["publish"].upper() != "TRUE" or not finalized(row["approval"]):
             continue
         source = checked_source(row, "document_id", receipts, publication_day)
         pid = row["project_id"]
@@ -249,8 +259,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     tables, stamp = load_tables(SOURCES, args.fixture)
     print("Catalogue records and client documents:", *build(tables, args.output, stamp))
-    if not args.fixture:
-        # Directly fetch the approved historical clean Payment workbook using
-        # the same read-only, keyless Google federation. Failure blocks deploy.
-        from publish_field_payments import publish_payments
-        print("Verified clean historical payment records:", publish_payments(args.output))

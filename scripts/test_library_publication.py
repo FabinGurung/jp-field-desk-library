@@ -15,7 +15,7 @@ class LibraryPublicationTest(unittest.TestCase):
                 ["Resource ID", "Publish", "Source Drive File ID", "Source URL", "Project ID",
                  "Project Name", "Site Reference", "Display Name", "Category", "Format", "Sort Priority", "Approval Status", "Discipline", "Revision Note"],
                 ["RES-001", True, file_id, f"https://drive.google.com/file/d/{file_id}/view", "PRJ-000001",
-                 "Example", "P001", "Field plan", "issued_reports", "PDF", 1, "Unverified", "Architecture", "Issue/revision not independently certified"],
+                 "Example", "P001", "Field plan", "issued_reports", "PDF", 1, "Approved", "Architecture", "Final issue confirmed"],
                 ["RES-002", False, "private", "https://example.org/private", "PRJ-000001",
                  "Example", "P001", "Private", "issued_reports", "PDF", 1, "Unverified", "Architecture", "Issue/revision not independently certified"],
             ],
@@ -23,7 +23,7 @@ class LibraryPublicationTest(unittest.TestCase):
                 ["Document ID", "Publish", "Project ID", "Company Project Code", "Project Name", "Locality",
                  "Drive File ID", "Role", "Language", "Title", "Version", "Pages", "Approval"],
                 ["DOC-001", True, "PRJ-000001", "REB-001", "Example", "Ward 1", doc_id,
-                 "A", "en", "Agreement", "v1", 2, "Unsigned"],
+                 "A", "en", "Agreement", "v1", 2, "Signed"],
             ],
             "readback": [
                 ["Record ID", "Drive File ID", "MIME Type", "Modified At", "Access Mode", "Checked On", "Admission Basis"],
@@ -46,9 +46,14 @@ class LibraryPublicationTest(unittest.TestCase):
             self.assertNotIn("https://fabingurung.github.io/JP_Communication-Command-Centre-and-Resource-Hub/", packet_page)
             self.assertIn("https://fabingurung.github.io/jp-a7-system-registry/memory-wall.html",
                           (out / "index.html").read_text())
-            self.assertTrue((out / "source-custody.json").exists())
+            self.assertFalse((out / "source-custody.json").exists())
+            self.assertFalse((out / "field-payments.json").exists())
             with self.assertRaisesRegex(ValueError, "Stale Drive owner readback"):
                 build(tables, out, "2026-12-20T12:00:00+05:45")
+            tables["resources"][1][11] = "UNVERIFIED_AS_CURRENT_ISSUE"
+            tables["packets"][1][12] = "Unsigned proposal"
+            self.assertEqual(build(tables, out, "test"), (0, 0))
+            tables["packets"][1][12] = "Signed"
             tables["packets"][1][6] = "changed_file_id_123456"
             with self.assertRaisesRegex(ValueError, "matching Drive readback"):
                 build(tables, out, "test")

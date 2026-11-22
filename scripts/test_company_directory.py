@@ -20,16 +20,16 @@ def sample():
     ]]
     for rid, pid, owner, slot, fmt in [
         ("RES-SYN-A", "PRJ-000001", "Example Construction A", "Architectural drawings", "DWG"),
-        ("RES-SYN-B", "PRJ-000002", "Example Construction B", "Source folder", "FOLDER"),
+        ("RES-SYN-B", "PRJ-000002", "Example Construction B", "Structural drawings", "PDF"),
     ]:
         fid = "SyntheticDriveFile" + rid[-1]
         link = (f"https://drive.google.com/drive/folders/{fid}" if fmt == "FOLDER" else
                 f"https://drive.google.com/file/d/{fid}/view")
         resources.append([rid, True, fid, link, pid, "Site " + rid[-1], "S-01", "Source " + rid[-1],
                           "source_folders" if fmt == "FOLDER" else "source_models", fmt, 1,
-                          "Review pending", owner, slot,
+                          "Approved", owner, slot,
                           "Architecture" if fmt == "DWG" else "Source file folder",
-                          "Issue/revision not independently certified"])
+                          "Final issue confirmed"])
         receipts.append([rid, fid, "application/vnd.google-apps.folder" if fmt == "FOLDER" else
                          "application/dwg", "2026-11-09T06:00:00Z", "DRIVE_PERMISSION_REQUIRED",
                          "2026-11-09", "LEGACY_PUBLIC_ROUTE"])
@@ -38,12 +38,12 @@ def sample():
                       "https://drive.google.com/file/d/SensitiveOriginal12345/view",
                       "PRJ-000001", "Site A", "S-01", "DO-NOT-PUBLISH", "source_models", "PDF", 1,
                       "Private", "Example Construction A", "Technical reports and supporting files",
-                      "Structure", "Issue/revision not independently certified"])
+                      "Structure", "Final issue confirmed"])
     packets = [[
         "Document ID", "Publish", "Project ID", "Company Project Code", "Project Name", "Locality",
         "Drive File ID", "Role", "Language", "Title", "Version", "Pages", "Approval",
     ], ["DOC-SYN-A", True, "PRJ-000029", "REB-002", "Site C", "Site C", "SyntheticPacketFileABC",
-         "A", "en", "Agreement", "draft", "2", "Not signed"]]
+         "A", "en", "Agreement", "v1", "2", "Signed"]]
     receipts.append(["DOC-SYN-A", "SyntheticPacketFileABC", "application/pdf",
                      "2026-11-09T06:00:00Z", "DRIVE_PERMISSION_REQUIRED",
                      "2026-11-09", "LEGACY_PUBLIC_ROUTE"])
@@ -64,9 +64,9 @@ class CompanyDirectoryTest(unittest.TestCase):
             self.assertEqual(sum(c["document_count"] for c in catalog["companies"]), 1)
             self.assertIn(UNASSIGNED_COMPANY, [c["name"] for c in catalog["companies"]])
             self.assertEqual(catalog["resources"][0]["group"], "drawings")
-            self.assertEqual(catalog["resources"][1]["group"], "source-folders")
+            self.assertEqual(catalog["resources"][1]["group"], "drawings")
             self.assertEqual(catalog["resources"][0]["discipline"], "Architecture")
-            self.assertEqual(catalog["resources"][0]["revision_note"], "Issue/revision not independently certified")
+            self.assertEqual(catalog["resources"][0]["revision_note"], "Final issue confirmed")
             self.assertEqual(catalog["source_manifest"]["tabs_fetched"], [
                 "project_resources", "client_document_packets", "resource_source_readback"])
             self.assertFalse(catalog["source_manifest"]["private_payroll_connected"])
@@ -117,8 +117,7 @@ class CompanyDirectoryTest(unittest.TestCase):
 
     def test_public_files_and_editor_guide(self):
         from publish_library import SITE_FILES
-        for name in ("editing.html", "editing.css", "operations.html", "operations.js",
-                     "source-custody.json", "index.html", "app.js", "styles.css"):
+        for name in ("editing.html", "editing.css", "operations.html", "legacy-route.js", "index.html", "app.js", "styles.css"):
             self.assertIn(name, SITE_FILES)
             self.assertTrue((ROOT / "site" / name).exists())
         html = (ROOT / "site/index.html").read_text()
@@ -137,11 +136,11 @@ class CompanyDirectoryTest(unittest.TestCase):
         self.assertIn('id="facet-revision"', html)
         self.assertIn('id="facet-approval"', html)
         self.assertIn("@media(max-width:700px)", (ROOT / "site/styles.css").read_text())
-        self.assertIn('Open file information', (ROOT / "site/editing.html").read_text())
+        self.assertIn('Record approval and confirm the link', (ROOT / "site/editing.html").read_text())
         self.assertIn("Project Resources", (ROOT / "site/editing.html").read_text())
         self.assertTrue(company_key("Company A").startswith("display-"))
         self.assertIn(("project-packets", "Agreements & Materials"), GROUPS)
-        for resource in ("workspaces.html", "field.html", "field-payments.js", "money.html", "money.js", "portal.css", "memory-wall/index.html", "memory-wall/sheets.css", "memory-wall/sheets.js"):
+        for resource in ("workspaces.html", "field.html", "money.html", "portal.css", "memory-wall/index.html"):
             self.assertIn(resource, SITE_FILES)
             self.assertTrue((ROOT / "site" / resource).exists())
         app = (ROOT / "site/app.js").read_text()
@@ -154,28 +153,13 @@ class CompanyDirectoryTest(unittest.TestCase):
         desk = (ROOT / "site/index.html").read_text()
         field = (ROOT / "site/field.html").read_text()
         workspaces = (ROOT / "site/workspaces.html").read_text()
-        self.assertIn('href="./field.html"', desk)
-        self.assertIn('aria-current="page">Drawings &amp; Files', desk)
-        self.assertIn('aria-current="page">Field Resources', field)
-        for title in ("Worker Money &amp; Goods", "Bills of contractor", "Bills of vendor",
-                      "Measurements of works", "Attendance"):
-            self.assertIn(title, field)
-        self.assertIn("Rohini Engineering and Builders", field)
-        self.assertIn("Fishtail Builders", field)
-        self.assertIn("NOT ADMITTED", field)
-        self.assertIn("1ShS8wI6OAZA6Is-DLJK3sVkJzl3i5mn5zK-on38fE9I", field)
-        self.assertIn("historical-payments", field)
-        self.assertNotIn("1MsHpWUj5NU7eEWhAgyJTusn19c1VeppY", field)
-        self.assertNotIn("drive.google.com/file/d/", field)
-        self.assertNotIn("drive.google.com/drive/folders/", field)
-        self.assertIn('href="./field.html"', workspaces)
+        self.assertNotIn('href="./field.html"', desk)
+        self.assertIn('aria-current="page">Finalized Files', desk)
+        self.assertIn('/jp-estimating-and-boq/field.html', field)
         self.assertIn('href="./"', workspaces)
-        self.assertIn("Original records stay in Google Drive", field)
+        self.assertNotIn('docs.google.com/spreadsheets', field)
         money = (ROOT / "site/money.html").read_text()
-        self.assertIn("not verified as final", money)
-        self.assertIn("01_JP", money)
-        self.assertNotIn("drive.google.com/drive/folders/", money)
-        self.assertIn("other worker records remain private", (ROOT / "site/operations.js").read_text().lower())
+        self.assertIn('/jp-estimating-and-boq/finance.html', money)
 
 
 if __name__ == "__main__":

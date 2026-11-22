@@ -4,20 +4,6 @@
  const node=(tag,body,cls)=>{const e=document.createElement(tag);if(body!==null&&body!==undefined)e.textContent=body;if(cls)e.className=cls;return e};
  const put=(parent,tag,body,cls)=>{const e=node(tag,body,cls);parent.append(e);return e};
  const safeDrive=u=>/^https:\/\/drive\.google\.com\/(?:file\/d\/[A-Za-z0-9_-]+\/view|drive\/folders\/[A-Za-z0-9_-]+)$/.test(u||"");
- const ledger="https://docs.google.com/spreadsheets/d/";
- const ownerBooks={
-  "Fishtail Builders Pvt Ltd":{
-   materials:ledger+"1YshLrDAJDg3CO8F1jmIr2Eucy0-TKwiviVNF5tiAfT0/edit",
-   progress:ledger+"1-pE1d4uxytIZsKF8Tzu3eBDlXL4MLIYiGGvVoKMqo1k/edit",
-   measurements:ledger+"1NvvOD7UUDAvWVnGOC33q2MOy3h6ZDoD1Y2es9l3dpiY/edit"
-  },
-  "Rohini Engineering and Builders Pvt Ltd":{
-   materials:ledger+"1GQQDRg3bDPVIrfs1oVm_ycmyBE5NlpxEKzu1DsAz6tk/edit",
-   progress:ledger+"1agDIiVfTwicWAxix07HaukX7EemNdO4IyghYcBH_kys/edit"
-  }
- };
- const sourceDirectory=ledger+"1e019Jac4lDveZ2glXMph4RLHivqPFEachbcNi-R1DZk/edit";
- const attendance=ledger+"1FuFvccGvDwlszfzGL7_TP4qChBptA8Pil7eq6O5qlPw/edit";
  const state={projects:[],catalog:null,packets:null,selected:"",company:"",status:"",query:""};
  const saved=new URLSearchParams(location.search).get("project")||"";
  const opts=(input,arr)=>{for(const value of arr){const o=node("option",value);o.value=value;input.append(o)}};
@@ -49,7 +35,7 @@
    put(pane,"p",(p.status||"Status not verified")+" · "+p.company,"project-meta");
    if(p.verification&&p.verification!=="VERIFIED")put(pane,"p","Some project details still need confirmation.","project-warning");
    const rs=resources(p),ds=docs(p);
-   put(pane,"p",rs.length+" file and folder links · "+ds.length+" client documents","project-count-note");
+   put(pane,"p",rs.length+" finalized file links · "+ds.length+" client documents","project-count-note");
    const grouped={};for(const r of rs)(grouped[classify(r)] ||= []).push(r);
    if(ds.length)grouped["Agreements & project packets"]=ds.map(d=>({title:d.title+" · "+d.version,url:d.drive_url,format:"PDF",approval:d.approval}));
    for(const family of families){
@@ -62,22 +48,13 @@
          link(wrap,r.title+" ↗",r.url,"project-source");
          put(wrap,"small",(r.format||"Original")+" · Check approved revision before using");
        }
-     }else put(section,"p","No file listed here yet. Check the project Drive folder or ask the document owner.","no-file");
+     }else put(section,"p","No file listed here yet. Ask the document owner about the final issue.","no-file");
    }
    if(p.project_id==="JPENT-ASTAM-2026-01"){
       const c=put(pane,"div",null,"project-owned-actions");
       link(c,"Astam land and buyer research →","./feasibility/");
       put(c,"p","Land purchase is on hold pending review of the original documents.");
    }
-   const routes=put(pane,"div",null,"project-owned-actions");
-   put(routes,"strong","Record the next field entry");
-   const owner=ownerBooks[p.company]||{};
-   if(owner.materials)link(routes,"Materials movements — company Sheet ↗",owner.materials);
-   if(owner.progress)link(routes,"Daily site work — company Sheet ↗",owner.progress);
-   if(owner.measurements)link(routes,"Measurement evidence — Fishtail Sheet ↗",owner.measurements);
-   link(routes,"Attendance — project tabs ↗",attendance);
-   link(routes,"Project Resources register ↗",sourceDirectory);
-   put(routes,"p","These are company-wide workbooks. Choose this project within the Sheet before entering a new record.");
    // The drawing repository's public projects.json currently reuses
    // PRJ-000029 for Ramachandra, but canonical A7 assigns it to Basanti.
    // Suppress ambiguous project-ID code searches rather than cross-attach.

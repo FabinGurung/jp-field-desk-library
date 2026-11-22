@@ -5,6 +5,8 @@ import re
 from collections import Counter
 from pathlib import Path
 
+from publish_library import finalized
+
 URL = re.compile(r"^https://drive\.google\.com/(?:file/d/[A-Za-z0-9_-]+/view|drive/folders/[A-Za-z0-9_-]+)$")
 
 
@@ -23,39 +25,13 @@ def validate(directory):
             or any(not re.fullmatch(r"PRJ-[0-9]{6}", pid or "") for pid in pids)):
         raise ValueError("Public canonical project directory source validation failed")
 
-    wall = (directory / "memory-wall/index.html").read_text(encoding="utf-8")
-    links = re.findall(r'href="(https://docs\.google\.com/spreadsheets/d/[A-Za-z0-9_-]+/edit)"', wall)
-    if len(links) != 35 or len(set(links)) != 35:
-        raise ValueError("Google Sheets staff page must contain 35 distinct original links")
-    for file in ("memory-wall/sheets.css", "memory-wall/sheets.js", "assets/css/resource-unified.css"):
-        if not (directory / file).exists():
-            raise ValueError("Staff Google Sheets page assets missing")
-    custody = json.loads((directory / "source-custody.json").read_text(encoding="utf-8"))
-    payment = json.loads((directory / "field-payments.json").read_text(encoding="utf-8"))
-    if payment.get("schema_version") != "1.0.0":
-        raise ValueError("Unexpected historical Payment publication schema")
-    src = payment.get("source", {})
-    if (src.get("source_status") != "HISTORICAL_CLEANED_PAYMENT_NOT_CERTIFIED_PAYROLL"
-            or src.get("public_export_approved_on") != "2026-11-12"
-            or src.get("worker_money_goods_transaction_feed") is not False):
-        raise ValueError("Unapproved/misclassified historical Payment publication")
-    entries = payment.get("records", [])
-    if (len(entries) != payment.get("count")
-            or len({r.get("id") for r in entries}) != len(entries)
-            or len({r.get("worker_id") for r in entries}) != payment.get("worker_count")):
-        raise ValueError("Historical Payment row/grain count mismatch")
-    if round(sum(float(r["amount_npr"]) for r in entries), 2) != round(float(payment["total_npr"]), 2):
-        raise ValueError("Historical Payment amount sum mismatch")
-    for r in entries:
-        # A blank source site is legitimate (184 of the 958 real records).
-        # It must remain "", never guessed as a project/site or discarded.
-        if (not all(r.get(k) for k in ("id", "worker_id", "worker", "date",
-                                     "category", "source_row", "source_cell"))
-                or "site" not in r or not isinstance(r["site"], str)
-                or not re.fullmatch(r"20[0-9]{2}-[0-9]{2}-[0-9]{2}", r["date"])
-                or any(k in r for k in ("paid_by", "bank_details", "phone", "remarks"))):
-            raise ValueError("Historical Payment source identity or allowed fields invalid")
-
+    guide = (directory / "editing.html").read_text(encoding="utf-8")
+    links = re.findall(r'href="(https://docs\.google\.com/spreadsheets/d/[A-Za-z0-9_-]+/edit)"', guide)
+    if len(set(links)) != 1:
+        raise ValueError("Desk editing guide must point to one authoritative catalogue")
+    for path in ("field-payments.json", "field-payments.js", "source-custody.json"):
+        if (directory / path).exists():
+            raise ValueError("Field data leaked into Desk Resources")
     if catalog.get("schema_version") != "2.0.0" or packets.get("schema_version") != "1.0.0":
         raise ValueError("Unexpected public artifact schema")
     source = catalog["source_manifest"]
@@ -63,10 +39,6 @@ def validate(directory):
         raise ValueError("Private payroll cannot be exposed by the Pages publisher")
     if source.get("original_drive_files_rechecked") is not False or source.get("source_revision_proven") is not False:
         raise ValueError("False independent Drive revision/readback claim")
-    if custody.get("historical_clean_payment_publication") is not True or custody.get("authenticated_private_payroll_reads") is not True:
-        raise ValueError("Authenticated historical clean Payment publication not recorded")
-    if custody.get("live_worker_sync") is not False:
-        raise ValueError("Source custody claims unavailable private sync")
     groups = {c["key"] for c in catalog["groups"]}
     companies = {c["key"]: c for c in catalog["companies"]}
     projects = {p["project_id"]: p for p in catalog["projects"]}
@@ -76,7 +48,8 @@ def validate(directory):
     packet_counts = Counter()
     ids = set()
     for r in catalog["resources"]:
-        if r["id"] in ids or not URL.fullmatch(r["url"]):
+        if (r["id"] in ids or not URL.fullmatch(r["url"]) or "/drive/folders/" in r["url"]
+                or r.get("kind") != "desk" or not finalized(r["approval"])):
             raise ValueError("Duplicate or invalid public resource")
         ids.add(r["id"])
         if r["group"] not in groups or r["project_id"] not in projects:
@@ -88,7 +61,7 @@ def validate(directory):
             raise ValueError("Unproven published row")
         resource_counts[r["project_id"]] += 1
     for d in packets["documents"]:
-        if d["project_id"] not in projects or d["document_id"] in ids or not URL.fullmatch(d["drive_url"]):
+        if d["project_id"] not in projects or d["document_id"] in ids or not URL.fullmatch(d["drive_url"]) or not finalized(d["approval"]):
             raise ValueError("Broken packet identity")
         ids.add(d["document_id"])
         packet_counts[d["project_id"]] += 1
@@ -106,8 +79,8 @@ def validate(directory):
                 c["project_count"], c["resource_count"], c["document_count"]):
             raise ValueError("Company summary counts differ from underlying rows")
     for path in ("index.html", "app.js", "styles.css", "editing.html",
-                 "editing.css", "workspaces.html", "field.html", "field-payments.js", "money.html", "money.js", "portal.css",
-                 "operations.html", "operations.js", "operations.css",
+                 "editing.css", "workspaces.html", "field.html", "money.html",
+                 "operations.html", "legacy-route.js",
                  "resources/project-documents.html"):
         if not (directory / path).is_file():
             raise ValueError("Missing public route/asset: " + path)
