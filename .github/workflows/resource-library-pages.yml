@@ -4,6 +4,7 @@ on:
     paths:
       - 'site/**'
       - 'scripts/**'
+      - '.github/source-gallery/**'
       - 'docs/releases/v1.3.0.md'
       - 'docs/releases/v1.3.2.md'
       - 'docs/releases/v1.4.0.md'
@@ -24,6 +25,7 @@ on:
     paths:
       - 'site/**'
       - 'scripts/**'
+      - '.github/source-gallery/**'
       - 'docs/releases/v1.3.0.md'
       - 'docs/releases/v1.3.2.md'
       - 'docs/releases/v1.4.0.md'
@@ -71,6 +73,8 @@ jobs:
       - name: Validate synthetic public artifact
         run: |
           python scripts/build_browser_fixture.py _preview
+          python scripts/validate_public_artifact.py --site _preview
+          python .github/source-gallery/install.py _preview jp-field-desk-library
           python scripts/validate_public_artifact.py --site _preview
 
   browser-qa:
@@ -157,6 +161,8 @@ jobs:
         run: python scripts/validate_public_artifact.py --site _site
       - name: Install the registered Google Drive source gallery
         run: python3 .github/source-gallery/install.py _site jp-field-desk-library
+      - name: Validate final public artifact after gallery installation
+        run: python scripts/validate_public_artifact.py --site _site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
