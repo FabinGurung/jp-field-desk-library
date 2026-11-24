@@ -32,6 +32,16 @@ class ProjectDirectoryTests(unittest.TestCase):
             self.assertEqual(count,29)
             self.assertEqual(payload["publication_method"],"DATED_OWNER_REVIEWED_FALLBACK")
             self.assertTrue(payload["no_documents_inferred"])
+    def test_access_failure_is_classified_without_exposing_source(self):
+        with tempfile.TemporaryDirectory() as folder:
+            with patch.dict("os.environ", {"GOOGLE_ACCESS_TOKEN": "synthetic-test-token"}):
+                with patch("publish_project_directory.read_all", side_effect=RuntimeError("Sheets read failed (403) for projects")):
+                    with patch("builtins.print") as log:
+                        publish_project_directory(folder, "2026-11-24")
+            log.assert_any_call("Project identity source read failure:", "403")
+            result = json.loads((Path(folder)/"projects-directory.json").read_text())
+            self.assertEqual(result["publication_method"], "AUTHENTICATED_SOURCE_ACCESS_UNVERIFIED__DATED_FALLBACK")
+
     def test_double_read_and_validated_public_only(self):
         columns=["Project ID","Display Name","Company Project Code","Executing Company ID","Status",
                  "Project Category","Verification Status","Data Quality Status","Is Public"]
