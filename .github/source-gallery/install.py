@@ -38,18 +38,7 @@ def install(site, slug):
     (site / 'source-gallery.js').write_bytes((ROOT / 'source-gallery.js').read_bytes())
     # Validate the final injected artifact, including curated URL boundaries.
     gallery = (site / 'source-gallery.js').read_text(encoding='utf-8')
-    match = re.search(r'^  const config = (\{.*\});
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('site', type=Path)
-    parser.add_argument('slug')
-    arguments = parser.parse_args()
-    if not re.fullmatch(r'[A-Za-z0-9_.-]+', arguments.slug):
-        parser.error('Invalid GitHub Pages repository name')
-    install(arguments.site, arguments.slug)
-, gallery, re.M)
+    match = re.search(r'^  const config = (\{.*\});$', gallery, re.M)
     if not match:
         raise ValueError('Missing structured gallery config')
     cards = json.loads(match.group(1))['cards']
