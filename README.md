@@ -17,7 +17,7 @@ The site links project drawings, models, reports, source folders and client pack
 ## Purpose
 A reviewed public-safe directory arranged by **Company → Project → Resource category → Original Drive record**. The existing Project Resources LIVE workbook owns catalogue rows. GitHub owns the grouping generator, source-consistency checks, site UI, tests, release notes, and publication pipeline. The original Google Drive files and their permissions remain authoritative.
 
-**Currently published:** the reviewed Project Resources LIVE directory and owner-approved **historical CLEAN Payment v1.1** transactions. Operational W01–W21 Money & Goods balances, live payroll certification and contractor bill calculations remain separate; the source-custody page is dated evidence, not itself a current operational ledger.
+**Currently published:** the reviewed Project Resources LIVE catalogue, client packet links, the canonical project directory (with explicit dated fallback when access is unverified), and the previously reviewed Astam public-safe reference views. Field Resources, historical CLEAN Payment v1.1 and financial calculations are owned by JP Cost Estimation; old Desk routes redirect there. Historical release notes below are not statements of current publication.
 
 ## Operate and verify
 - [Pages source map and version-control contract](docs/governance/PAGES_SOURCE_MATRIX.md)
