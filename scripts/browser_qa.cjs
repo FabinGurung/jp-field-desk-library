@@ -60,6 +60,7 @@ async function qa() {
     await page.locator(".project-card").first().waitFor();
     assert.equal(await page.locator(".project-card").count(),29);
     assert.match(await page.locator("#project-provenance").innerText(),/Google Drive/i);
+    assert.match(await page.locator("#project-provenance").innerText(),/dated reviewed snapshot \(not a verified live refresh\)/i);
     await page.locator("#project-query").fill("Narayani");
     assert.equal(await page.locator(".project-card").count(),1);
     await page.locator(".project-card").click();
