@@ -123,7 +123,12 @@
    $("project-total").textContent=list.projects.length;
    $("project-with-files").textContent=state.projects.filter(p=>resources(p).length+docs(p).length>0).length;
    $("source-links").textContent=catalog.resources.length;
-   $("project-provenance").textContent="Files open in Google Drive. Confirm the latest approved revision before using any drawing for construction.";
+   const method = list.publication_method;
+   const provenance = method === "AUTHENTICATED_DOUBLE_READ__CANONICAL_PROJECTS"
+     ? "Project identities were read from the canonical Google Sheet at build time. "
+     : "Project identities use a dated reviewed snapshot (not a verified live refresh). ";
+   const baseline = typeof list.baseline_reviewed_on === "string" && list.baseline_reviewed_on ? "Snapshot reviewed: "+list.baseline_reviewed_on+". " : "";
+   $("project-provenance").textContent=provenance+(method === "AUTHENTICATED_DOUBLE_READ__CANONICAL_PROJECTS" ? "" : baseline)+"Files open in Google Drive. Confirm the latest approved revision before using any drawing for construction.";
    bind();render();details(state.projects.find(x=>x.project_id===saved)||state.projects[0]);
  }).catch(error=>{
    $("project-provenance").textContent="The project list is temporarily unavailable. Open the Projects & Locations Sheet instead.";
