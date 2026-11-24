@@ -84,6 +84,7 @@ def publish_project_directory(output, received_at):
                 raise ValueError("Project master changed during readback")
             projects = public_rows(first)
             method = "AUTHENTICATED_DOUBLE_READ__CANONICAL_PROJECTS"
+    print("Project identity publication method:", method)
     payload = {
         "schema_version": "1.0.0",
         "source_sheet_id": PROJECT_SHEET,
