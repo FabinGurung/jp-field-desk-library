@@ -16,6 +16,12 @@ def validate(directory):
     directory_index = json.loads((directory / "projects-directory.json").read_text(encoding="utf-8"))
     public_projects = directory_index.get("projects", [])
     pids = [p.get("project_id") for p in public_projects]
+    if directory_index.get("publication_method") not in {
+        "AUTHENTICATED_DOUBLE_READ__CANONICAL_PROJECTS",
+        "AUTHENTICATED_SOURCE_ACCESS_UNVERIFIED__DATED_FALLBACK",
+        "DATED_OWNER_REVIEWED_FALLBACK",
+    } or not directory_index.get("baseline_reviewed_on"):
+        raise ValueError("Missing or unknown project directory source provenance")
     if (directory_index.get("schema_version") != "1.0.0"
             or directory_index.get("no_documents_inferred") is not True
             or len(public_projects) < 29
