@@ -75,7 +75,11 @@ def publish_project_directory(output, received_at):
         try:
             first = read_all(SOURCES, token)["projects"]
             second = read_all(SOURCES, token)["projects"]
-        except RuntimeError:
+        except RuntimeError as error:
+            # Report only a safe error classification; never print source rows or credentials.
+            status = re.match(r"^Sheets read failed \((\d{3}|URLError|TimeoutError)\) for projects$", str(error))
+            reason = status.group(1) if status else "UNCLASSIFIED_READ_FAILURE"
+            print("Project identity source read failure:", reason)
             # An owner-controlled viewer grant may not yet exist on the
             # canonical source. Keep published names, but be explicit.
             method = "AUTHENTICATED_SOURCE_ACCESS_UNVERIFIED__DATED_FALLBACK"
