@@ -48,6 +48,20 @@ def validate(directory):
         if any(row[k] != eligible[row["project_id"]][k] for k in ("name", "company")):
             raise ValueError("Intake identity mismatch")
         intake_ids.add(row["project_id"]); intake_urls.add(row["url"])
+    person_intake = json.loads((directory / "person-intake.json").read_text(encoding="utf-8"))
+    if (set(person_intake) != {"schema_version", "access", "contents_published", "registered_on", "people"}
+            or person_intake["schema_version"] != "1.0.0"
+            or person_intake["access"] != "DRIVE_PERMISSION_REQUIRED"
+            or person_intake["contents_published"] is not False):
+        raise ValueError("Invalid person intake public boundary")
+    person_names, person_urls = set(), set()
+    for row in person_intake["people"]:
+        if (set(row) != {"name", "url"} or not isinstance(row["name"], str) or not row["name"].strip()
+                or row["name"].strip().casefold() in person_names or row["url"] in person_urls
+                or row["url"] in intake_urls
+                or not re.fullmatch(r"https://docs\.google\.com/document/d/[A-Za-z0-9_-]{15,100}/edit", row["url"])):
+            raise ValueError("Unsafe or duplicate personal intake link")
+        person_names.add(row["name"].strip().casefold()); person_urls.add(row["url"])
     guide = (directory / "editing.html").read_text(encoding="utf-8")
     links = re.findall(r'href="(https://docs\.google\.com/spreadsheets/d/[A-Za-z0-9_-]+/edit)"', guide)
     if len(set(links)) != 1:
