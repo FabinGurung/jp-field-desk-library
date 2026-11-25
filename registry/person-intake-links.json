@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0.0",
+  "registered_on": "2026-11-25",
+  "access": "DRIVE_PERMISSION_REQUIRED",
+  "entries": [
+    {
+      "name": "Fabin Gurung",
+      "document_id": "1eqpj1n54peNQo-78JWMhrUQK2c5jtpvtr8llC5mKMDA"
+    },
+    {
+      "name": "Krishna Kumar Gupta",
+      "document_id": "1yzFm159M6nMAsAfv4ND67jNpe8F4HqcDOhWv-hZg3J0"
+    },
+    {
+      "name": "Shiv Narayan Chaudhary",
+      "document_id": "1prwK3u2teCUKGdwqdQIBbXBotzEu4JJX_N5kYzqg34I"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import unittest
-from publish_intake import project_intake_rows, LIVE, ASTAM
+from publish_intake import project_intake_rows, person_intake_rows, LIVE, ASTAM
 
 class IntakeBoundaryTest(unittest.TestCase):
     def setUp(self):
@@ -25,6 +25,16 @@ class IntakeBoundaryTest(unittest.TestCase):
         del self.manifest["entries"][0]["content"]
         self.manifest["entries"][1]["document_id"]=self.manifest["entries"][0]["document_id"]
         with self.assertRaises(ValueError): project_intake_rows(self.manifest,self.directory,[])
+
+class PersonIntakeBoundaryTest(unittest.TestCase):
+    def test_names_and_links_only(self):
+        m={"schema_version":"1.0.0","registered_on":"2026-11-25","access":"DRIVE_PERMISSION_REQUIRED","entries":[{"name":"Example Person","document_id":"SyntheticPersonDoc1234"}]}
+        self.assertEqual(person_intake_rows(m),[{"name":"Example Person","url":"https://docs.google.com/document/d/SyntheticPersonDoc1234/edit"}])
+        m["entries"][0]["content"]="private"
+        with self.assertRaises(ValueError): person_intake_rows(m)
+        del m["entries"][0]["content"]
+        m["entries"].append({"name":"example person","document_id":"OtherSyntheticDoc123"})
+        with self.assertRaises(ValueError): person_intake_rows(m)
 
 if __name__=="__main__":
     unittest.main()

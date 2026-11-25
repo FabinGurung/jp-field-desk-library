@@ -40,3 +40,30 @@ def publish_intake(output, catalogue_projects):
                "projects":rows}
     (output / "project-intake.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("Project intake link-only directory:",len(rows))
+    publish_person_intake(output)
+
+def person_intake_rows(manifest):
+    if (set(manifest) != {"schema_version", "registered_on", "access", "entries"}
+            or manifest["schema_version"] != "1.0.0" or manifest["access"] != "DRIVE_PERMISSION_REQUIRED"
+            or not isinstance(manifest["entries"], list)):
+        raise ValueError("Invalid person intake manifest")
+    names, docs, rows = set(), set(), []
+    for row in manifest["entries"]:
+        if set(row) != {"name", "document_id"}:
+            raise ValueError("Person intake metadata must contain names and IDs only")
+        name, doc = row["name"], row["document_id"]
+        if (not isinstance(name, str) or not name.strip() or len(name) > 100
+                or name.strip().casefold() in names or doc in docs
+                or not re.fullmatch(r"[A-Za-z0-9_-]{15,100}", doc)):
+            raise ValueError("Invalid or duplicate person intake")
+        names.add(name.strip().casefold()); docs.add(doc)
+        rows.append({"name":name.strip(), "url":"https://docs.google.com/document/d/"+doc+"/edit"})
+    return rows
+
+def publish_person_intake(output):
+    manifest = json.loads((ROOT / "registry/person-intake-links.json").read_text(encoding="utf-8"))
+    rows = person_intake_rows(manifest)
+    payload = {"schema_version":"1.0.0","access":"DRIVE_PERMISSION_REQUIRED",
+               "contents_published":False,"registered_on":manifest["registered_on"],"people":rows}
+    (Path(output) / "person-intake.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    print("Person intake link-only directory:",len(rows))
