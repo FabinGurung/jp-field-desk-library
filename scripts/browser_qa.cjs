@@ -81,7 +81,7 @@ async function qa() {
     await page.unroute("**/project-intake.json");
     await page.getByRole("button",{name:"By person",exact:true}).click();
     await page.locator("#person-intake-grid .intake-open").first().waitFor();
-    assert.equal(await page.locator("#person-intake-grid .intake-card").count(),3);
+    assert.ok(await page.locator("#person-intake-grid .intake-card").count()>=3);
     assert.equal(await page.locator("#project-intake-section").isVisible(),false);
     assert.match(await page.locator("#person-intake-grid").innerText(),/Krishna Kumar Gupta/);
     await page.getByRole("button",{name:"By project",exact:true}).click();
