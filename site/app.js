@@ -9,7 +9,7 @@
   };
   const text = (parent, tag, value, cls) => { const child = make(tag, value, cls); parent.append(child); return child; };
   const safeDrive = url => /^https:\/\/drive\.google\.com\/(?:file\/d\/[A-Za-z0-9_-]+\/view|drive\/folders\/[A-Za-z0-9_-]+)$/.test(url || "");
-  const state = { data: null, company: "", project: "", selected: "", query: "", facets: {}, facetsProject: "" };
+  const state = { data: null, company: "", project: "", selected: "", query: "", facets: {}, facetsProject: "", fileView: "gallery" };
   const params = new URLSearchParams(location.search);
   state.company = params.get("company") || "";
   state.project = params.get("project") || "";
@@ -241,6 +241,51 @@
     if (remain.length) throw Error("Unclassified resource slot for " + groupKey);
     return result;
   }
+  function fileGallery(p, entries, stack) {
+    const shell=make("section",null,"gallery-shell");
+    shell.setAttribute("aria-label","Project file gallery");
+    const head=make("div",null,"gallery-head"), title=make("div");
+    text(title,"h3","Blueprint file gallery");
+    text(title,"p","Swipe, use the arrows, or switch to the complete file register.");
+    head.append(title);
+    const switches=make("div",null,"gallery-switch");
+    const galleryBtn=text(switches,"button","Curved gallery"), listBtn=text(switches,"button","Full list");
+    galleryBtn.type=listBtn.type="button";head.append(switches);shell.append(head);
+    const stage=make("div",null,"gallery-stage");shell.append(stage);
+    const rail=make("div",null,"gallery-rail");stage.append(rail);rail.tabIndex=0;rail.setAttribute("aria-label","Swipeable files");
+    const cards=[];
+    for(const item of entries){
+      const tile=make("article",null,"file-tile");tile.dataset.format=item.format||"FILE";
+      text(tile,"span",item.format||"FILE","file-icon");
+      text(tile,"span",item.slot,"file-category");text(tile,"h4",item.title);
+      if(item.original_filename&&item.original_filename!==item.title)text(tile,"small",item.original_filename);
+      text(tile,"div",item.packet?"Client documents · check approval in packet":humanLabel("approval",item.approval)||"Issue status not recorded","file-warning");
+      text(tile,"small",item.packet?"Original files remain in Drive":item.access==="DRIVE_PERMISSION_REQUIRED"?"Google Drive permission required":"Open with existing Drive access");
+      const actions=make("div",null,"file-actions");tile.append(actions);
+      if(item.packet||safeDrive(item.url)){const open=text(actions,"a",item.packet?"Open packet ↗":"Open original ↗","file-open");open.href=item.url;if(!item.packet){open.target="_blank";open.rel="noopener noreferrer";}}
+      if(!item.packet){const select=text(actions,"button","File details");select.type="button";select.addEventListener("click",()=>{state.selected=item.id;detail(item);if(window.matchMedia("(max-width:700px)").matches)$("east").scrollIntoView({block:"start",behavior:"auto"});});}
+      rail.append(tile);cards.push(tile);
+    }
+    if(!cards.length)text(rail,"p","No registered files match these filters. The full list shows every standard category.","gallery-empty");
+    const foot=make("div",null,"gallery-foot"), status=text(foot,"span","");
+    const arrows=make("div",null,"gallery-arrows"), prev=text(arrows,"button","← Previous"), next=text(arrows,"button","Next →");prev.type=next.type="button";foot.append(arrows);stage.append(foot);
+    let active=0,frame=0;
+    const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function measure(){
+      frame=0;if(stage.hidden)return;
+      const rr=rail.getBoundingClientRect(),middle=rr.left+rr.width/2;let distance=Infinity;
+      cards.forEach((card,i)=>{const dx=card.getBoundingClientRect().left+card.offsetWidth/2-middle;const ratio=Math.max(-1,Math.min(1,dx/Math.max(1,rr.width*.55)));card.style.setProperty("--tilt",reduced?"0deg":(-ratio*23)+"deg");card.style.setProperty("--scale",reduced?"1":String(1-Math.abs(ratio)*.09));if(Math.abs(dx)<distance){distance=Math.abs(dx);active=i;}});
+      cards.forEach((card,i)=>{card.dataset.active=String(i===active);});
+      status.textContent=cards.length?(active+1)+" / "+cards.length+" files":"No matching files";prev.disabled=!cards.length||active===0;next.disabled=!cards.length||active===cards.length-1;
+    }
+    function schedule(){if(!frame)frame=requestAnimationFrame(measure);}
+    function move(index){if(!cards.length)return;index=Math.max(0,Math.min(cards.length-1,index));const cr=cards[index].getBoundingClientRect(),rr=rail.getBoundingClientRect();rail.scrollTo({left:rail.scrollLeft+cr.left+cr.width/2-rr.left-rr.width/2,behavior:reduced?"auto":"smooth"});}
+    prev.addEventListener("click",()=>move(active-1));next.addEventListener("click",()=>move(active+1));rail.addEventListener("scroll",schedule,{passive:true});
+    rail.addEventListener("keydown",e=>{if(e.target!==rail)return;if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();move(active+(e.key==="ArrowLeft"?-1:1));}});
+    function view(mode){state.fileView=mode;const isGallery=mode==="gallery";stage.hidden=!isGallery;stack.hidden=isGallery;galleryBtn.setAttribute("aria-pressed",String(isGallery));listBtn.setAttribute("aria-pressed",String(!isGallery));if(isGallery)schedule();}
+    galleryBtn.addEventListener("click",()=>view("gallery"));listBtn.addEventListener("click",()=>view("list"));
+    view(state.fileView);return shell;
+  }
   function projectResources() {
     const root = $("workspace"); root.replaceChildren();
     const p = state.data.projects.find(x => x.project_id === state.project && x.company_key === state.company);
@@ -258,12 +303,13 @@
       text(root,"p","Company assignment requires original source-owner confirmation.", "review");
     }
     const intro = make("div",null,"matrix-intro");
-    text(intro,"strong","Same slots for every project");
-    text(intro,"p","Empty slots are shown deliberately. Open one to see whether a file has been registered. An empty slot does not prove the original file does not exist.");
+    text(intro,"strong","Browse registered files first");
+    text(intro,"p","The gallery shows registered files only. Switch to Full list to inspect every standard category, including empty slots."); const intake=text(intro,"a","Open this project’s intake journal ↗","detail-project-link");intake.href="./intake.html?project="+encodeURIComponent(p.project_id);
     root.append(intro);
     if(p.project_id.startsWith("JPENT-ASTAM-")) { const notice=make("aside",null,"project-context-note");text(notice,"strong","Astam Village · pre-purchase feasibility");text(notice,"p","Purchase on HOLD · original JP Enterprise sources · approval unverified · permanent PRJ ID pending.");const guide=text(notice,"a","View existing feasibility research ↗");guide.href="./feasibility/";root.append(notice); }
     const stack = make("div",null,"group-stack");
     let matchingFiles = 0;
+    const galleryEntries=[];
     const hasQuery = Boolean(state.query);
     const hasFacets = Object.values(state.facets).some(Boolean);
     for (const group of state.data.groups) {
@@ -285,6 +331,7 @@
       const allSlots=splitIntoSlots(group.key,all);
       for (const slot of allSlots) {
         const matched = slot.records.filter(r => matching.includes(r));
+        for(const r of matched)galleryEntries.push({...r,slot:slot.label});
         const slotCard=make("details",null,"resource-slot");
         slotCard.dataset.slot=slot.key;
         slotCard.open=Boolean(matched.length) || (group.key === "project-packets" && hasPackets && packetMatches);
@@ -295,6 +342,7 @@
         slotCard.append(slotTitle);
         const content=make("div",null,"slot-contents");
         if (group.key === "project-packets" && hasPackets && packetMatches) {
+          galleryEntries.push({packet:true,format:"PDF",slot:slot.label,title:"A/B/C client documents · "+p.document_count+" linked PDFs",url:"./resources/project-documents.html?project="+encodeURIComponent(p.project_id)});
           const a=text(content,"a","Open A/B/C documents · "+p.document_count+" linked PDFs","packet-link");
           a.href="./resources/project-documents.html?project="+encodeURIComponent(p.project_id);
         } else if (matched.length) {
@@ -332,7 +380,8 @@
       stack.append(groupCard);
     }
     $("facet-count").textContent=matchingFiles+" of "+p.resource_count+
-      " resources match · Empty slots stay visible for consistent project navigation";
+      " resources match · Full list includes empty categories";
+    root.append(fileGallery(p,galleryEntries,stack));
     root.append(stack);
     const siblings=orderedProjects(state.company),at=siblings.findIndex(x=>x.project_id===p.project_id);
     const pager=make("nav",null,"page-trail project-pager");pager.setAttribute("aria-label","Previous and next projects");
