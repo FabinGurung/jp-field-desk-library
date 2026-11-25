@@ -1,0 +1,9 @@
+# Project Intake and Blueprint Gallery — 2026-11-25
+
+A new top-level Project Intake page is separate from Desk Resources and All Projects. The permanent native Google Docs are stored in the Desk Resources synchronized Drive folder / 04 Project Intake — Permanent Google Docs. 29 public canonical projects plus the separately verified Astam feasibility identity have one Doc each. Original Docs are permission-controlled. The dated registration in registry/project-intake-links.json contains only project and document identifiers; the publisher projects link-only records against the authenticated current A7 public project list. Astam is admitted separately only from the exact reviewed catalogue identity. A stale A7 fallback does not authorize canonical intake links. No Docs text, evidence, payments, credentials or ledger records are exported. No change to existing Estimation or Operations Sheets or source permission grants. No automatic transfer.
+
+Each Doc has a free-form intake journal, optional entry structure and transfer log. AI must resolve the existing target workbook/tab and schema, verify date/calendar, units, amounts, parties and evidence, deduplicate, obtain authorization where needed, append only to allowed destinations and record readback. The actual Doc ID is stable; edits belong there. New projects need a reviewed Doc registration, not a template redesign.
+
+The gallery is a mobile-friendly perspective scroll rail with swipe, arrow and keyboard navigation, format labels, original file links and issue/access warnings. The Full list alternative retains original categories including empty slots, source and filter logic. All Projects links to the matching intake journal and collapses empty families. The underlying resource catalogue and approval semantics are unchanged.
+
+Rollback: revert the UI/publisher commits if necessary; preserve every original intake Doc and permanent ID. No delete, archive or move of originals is required.

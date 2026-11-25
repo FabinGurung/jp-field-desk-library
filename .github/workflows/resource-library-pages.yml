@@ -4,6 +4,7 @@ on:
     paths:
       - 'site/**'
       - 'scripts/**'
+      - 'registry/project-intake-links.json'
       - '.github/source-gallery/**'
       - 'docs/releases/v1.3.0.md'
       - 'docs/releases/v1.3.2.md'
@@ -25,6 +26,7 @@ on:
     paths:
       - 'site/**'
       - 'scripts/**'
+      - 'registry/project-intake-links.json'
       - '.github/source-gallery/**'
       - 'docs/releases/v1.3.0.md'
       - 'docs/releases/v1.3.2.md'
@@ -67,6 +69,7 @@ jobs:
           persist-credentials: false
       - run: node --check site/app.js
       - run: node --check site/projects.js
+      - run: node --check site/intake.js
       - run: node --check site/legacy-route.js
       - run: node --check scripts/browser_qa.cjs
       - run: python -m unittest discover -s scripts -p 'test_*.py' -v

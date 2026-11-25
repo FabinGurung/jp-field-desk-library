@@ -37,11 +37,13 @@
    if(p.verification&&p.verification!=="VERIFIED")put(pane,"p","Some project details still need confirmation.","project-warning");
    const rs=resources(p),ds=docs(p);
    put(pane,"p",rs.length+" file and folder links · "+ds.length+" client documents","project-count-note");
+   link(pane,"Open project intake journal ↗","./intake.html?project="+encodeURIComponent(p.project_id),"intake-open");
    const grouped={};for(const r of rs)(grouped[classify(r)] ||= []).push(r);
    if(ds.length)grouped["Agreements & project packets"]=ds.map(d=>({title:d.title+" · "+d.version,url:d.drive_url,format:"PDF",approval:d.approval}));
    for(const family of families){
-     const section=put(pane,"section",null,"project-family");
-     const title=put(section,"h4",family);
+     const section=put(pane,"details",null,"project-family");
+     section.open=Boolean((grouped[family]||[]).length);
+     const title=put(section,"summary",family);
      const group=grouped[family]||[];
      put(title,"small",group.length?(" · "+group.length):" · not listed");
      if(group.length){const groupWrap=put(section,"div",null,"source-list");

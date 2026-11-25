@@ -18,6 +18,7 @@ ACCESS_MODES = {"PUBLIC_LINK", "DRIVE_PERMISSION_REQUIRED"}
 ADMISSION = {"LEGACY_PUBLIC_ROUTE", "OWNER_REVIEWED_PUBLIC_LINK"}
 SITE_FILES = ("index.html", "app.js", "styles.css", "projects.html", "projects.js",
               "projects-register.baseline.json", "assets/css/project-guide.css",
+              "intake.html", "intake.js", "assets/css/blueprint-gallery.css",
               "system-map.html",
               "resources/project-documents.html",
               "operations.html", "legacy-route.js",
@@ -241,6 +242,8 @@ def build(tables, out, received_at):
     from publish_project_directory import publish_project_directory
     project_count = publish_project_directory(out, received_at)
     print("Public canonical project directory:", project_count)
+    from publish_intake import publish_intake
+    publish_intake(out, projects)
     (out / ".nojekyll").touch()
     (out / "catalog.json").write_text(json.dumps({
         "schema_version": "2.0.0", "companies": companies, "projects": projects,

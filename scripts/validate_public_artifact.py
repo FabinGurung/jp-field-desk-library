@@ -30,6 +30,24 @@ def validate(directory):
             or any(not re.fullmatch(r"PRJ-[0-9]{6}", pid or "") for pid in pids)):
         raise ValueError("Public canonical project directory source validation failed")
 
+    intake = json.loads((directory / "project-intake.json").read_text(encoding="utf-8"))
+    if (set(intake) != {"schema_version", "access", "contents_published", "registered_on", "projects"}
+            or intake["schema_version"] != "1.0.0" or intake["access"] != "DRIVE_PERMISSION_REQUIRED"
+            or intake["contents_published"] is not False):
+        raise ValueError("Invalid intake public boundary")
+    eligible = {p["project_id"]:p for p in public_projects} if directory_index["publication_method"] == "AUTHENTICATED_DOUBLE_READ__CANONICAL_PROJECTS" else {}
+    for p in catalog["projects"]:
+        if p["project_id"] == "JPENT-ASTAM-2026-01" and p["company"] == "JP Enterprise" and p["name"] == "Astam Village — Land Feasibility":
+            eligible[p["project_id"]] = p
+    intake_ids, intake_urls = set(), set()
+    for row in intake["projects"]:
+        if (set(row) != {"project_id", "name", "company", "url"} or row["project_id"] not in eligible
+                or row["project_id"] in intake_ids or row["url"] in intake_urls
+                or not re.fullmatch(r"https://docs\.google\.com/document/d/[A-Za-z0-9_-]{15,100}/edit", row["url"])):
+            raise ValueError("Unsafe or duplicate intake public link")
+        if any(row[k] != eligible[row["project_id"]][k] for k in ("name", "company")):
+            raise ValueError("Intake identity mismatch")
+        intake_ids.add(row["project_id"]); intake_urls.add(row["url"])
     guide = (directory / "editing.html").read_text(encoding="utf-8")
     links = re.findall(r'href="(https://docs\.google\.com/spreadsheets/d/[A-Za-z0-9_-]+/edit)"', guide)
     if len(set(links)) != 1:
@@ -86,7 +104,7 @@ def validate(directory):
     for path in ("index.html", "app.js", "styles.css", "editing.html",
                  "editing.css", "workspaces.html", "field.html", "money.html",
                  "operations.html", "legacy-route.js",
-                 "resources/project-documents.html"):
+                 "resources/project-documents.html", "intake.html", "intake.js", "assets/css/blueprint-gallery.css"):
         if not (directory / path).is_file():
             raise ValueError("Missing public route/asset: " + path)
     # Astam's previously public-safe client resources live with the Library.
