@@ -23,6 +23,9 @@ async function qa() {
     await page.locator(".company-card").first().click();
     assert.equal(await page.locator(".project-card").count(),1);
     await page.locator(".project-card").first().click();
+    assert.equal(await page.locator(".file-tile").count(),1);
+    assert.equal(await page.locator(".file-tile .file-open").isVisible(),true);
+    await page.getByRole("button",{name:"Full list",exact:true}).click();
     assert.equal(await page.locator(".resource-line").count(),1);
     assert.equal(await page.locator(".resource-entry .resource-open").count(),1);
     assert.match(await page.locator(".resource-entry .resource-open").first().getAttribute("href"), /^https:\/\/drive\.google\.com\//);
@@ -68,6 +71,14 @@ async function qa() {
     assert.doesNotMatch(await page.locator("#project-detail-body").innerText(),/PRJ-000007|project_id|record_id|source readback/i);
     await page.locator("#clear-project-filters").click();
     assert.equal(await page.locator(".project-card").count(),29);
+    await page.goto(ROOT + "/intake.html", {waitUntil:"domcontentloaded"});
+    await page.waitForFunction(()=>document.getElementById("intake-status").textContent.includes("No links are available"));
+    assert.equal(await page.locator(".intake-card").count(),0); // synthetic preview has no live identity proof
+    await page.route("**/project-intake.json", route=>route.fulfill({json:{schema_version:"1.0.0",projects:[{project_id:"PRJ-000001",name:"Fixture project",company:"Fixture company",url:"https://docs.google.com/document/d/SyntheticIntakeDoc123/edit"}]}}));
+    await page.reload();await page.locator(".intake-card").first().waitFor();
+    assert.match(await page.locator(".intake-open").getAttribute("href"),/^https:\/\/docs\.google\.com\/document\/d\//);
+    await page.locator("#intake-search").fill("not a project");assert.equal(await page.locator(".intake-card").count(),0);
+    await page.unroute("**/project-intake.json");
     await page.goto(ROOT + "/editing.html", {waitUntil:"domcontentloaded"});
     assert.match(await page.locator("main").innerText(),/Project Resources Google Sheet/);
     assert.match(await page.locator("main").innerText(),/Record the current issue or approval status/);
@@ -94,14 +105,17 @@ async function qa() {
     await mobile.locator(".project-card").first().click();
     await mobile.locator("#facet-discipline").selectOption({label:"Architecture"});
     assert.equal(await mobile.locator(".resource-line").count(),1);
+    await mobile.getByRole("button",{name:"Full list",exact:true}).click();
     await mobile.locator(".resource-line").first().click();
     assert.match(await mobile.locator("#record-detail").innerText(),/Open original/);
+    await mobile.goto(ROOT + "/intake.html", {waitUntil:"domcontentloaded"});
+    assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth+2),"Intake mobile overflow");
     await mobile.goto(ROOT + "/projects.html", {waitUntil:"domcontentloaded"});
     await mobile.locator(".project-card").first().waitFor();
     const projectFit=await mobile.evaluate(()=>({viewport:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
     assert.ok(projectFit.scroll<=projectFit.viewport+2,"Project directory mobile overflow");
     await mobile.goto(ROOT + "/?company=display-example-construction-b&project=PRJ-000002", {waitUntil:"domcontentloaded"});
-    await mobile.locator(".resource-line").first().waitFor();
+    await mobile.locator(".file-tile").first().waitFor();
     assert.match(await mobile.locator("#workspace").innerText(),/Site B/);
     await mobile.goto(ROOT + "/resources/project-documents.html?project=PRJ-000029", {waitUntil:"domcontentloaded"});
     await mobile.locator("#load-status").waitFor();
