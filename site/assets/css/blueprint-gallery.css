@@ -47,3 +47,5 @@ body.blueprint :is(.resource-open,.source-button,.matrix-intro,.project-owned-ac
 .intake-guide{margin-top:24px;padding:18px;background:#fff;border:1px solid #ccdbed;border-radius:14px;color:#344e70}.intake-guide h2{margin:0 0 8px;font-size:1.1rem}.intake-guide p{font-size:.86rem}
 @media(max-width:700px){.gallery-rail{gap:10px}.gallery-head{padding:13px}.file-tile{padding:13px}.gallery-foot{padding:10px 13px}.intake-main{padding-top:14px}}
 @media(prefers-reduced-motion:reduce){.file-tile{transform:none;transition:none}.gallery-rail{scroll-behavior:auto!important}}
+
+body.blueprint .project-family>summary{font-size:.86rem;font-weight:800;cursor:pointer;color:#1c467d;margin-bottom:8px}body.blueprint .project-family>summary small{font-size:.72rem;font-weight:600;color:#526781}body.blueprint .project-inspector .intake-open{margin:8px 0 12px}.gallery-rail{--card-w:min(290px, 76cqw);container-type:inline-size;padding-inline:16px;scroll-padding-inline:16px}.file-tile{flex-basis:min(290px,78%)}
