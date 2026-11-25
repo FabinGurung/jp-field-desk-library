@@ -79,6 +79,13 @@ async function qa() {
     assert.match(await page.locator(".intake-open").getAttribute("href"),/^https:\/\/docs\.google\.com\/document\/d\//);
     await page.locator("#intake-search").fill("not a project");assert.equal(await page.locator(".intake-card").count(),0);
     await page.unroute("**/project-intake.json");
+    await page.getByRole("button",{name:"By person",exact:true}).click();
+    await page.locator("#person-intake-grid .intake-open").first().waitFor();
+    assert.equal(await page.locator("#person-intake-grid .intake-card").count(),3);
+    assert.equal(await page.locator("#project-intake-section").isVisible(),false);
+    assert.match(await page.locator("#person-intake-grid").innerText(),/Krishna Kumar Gupta/);
+    await page.getByRole("button",{name:"By project",exact:true}).click();
+    assert.equal(await page.locator("#person-intake-section").isVisible(),false);
     await page.goto(ROOT + "/editing.html", {waitUntil:"domcontentloaded"});
     assert.match(await page.locator("main").innerText(),/Project Resources Google Sheet/);
     assert.match(await page.locator("main").innerText(),/Record the current issue or approval status/);
