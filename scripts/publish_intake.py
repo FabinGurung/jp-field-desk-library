@@ -41,6 +41,7 @@ def publish_intake(output, catalogue_projects):
     (output / "project-intake.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("Project intake link-only directory:",len(rows))
     publish_person_intake(output)
+    publish_person_project_intake(output, directory)
 
 def person_intake_rows(manifest):
     if (set(manifest) != {"schema_version", "registered_on", "access", "entries"}
@@ -67,3 +68,35 @@ def publish_person_intake(output):
                "contents_published":False,"registered_on":manifest["registered_on"],"people":rows}
     (Path(output) / "person-intake.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("Person intake link-only directory:",len(rows))
+
+def person_project_rows(manifest, directory, people):
+    if (set(manifest) != {"schema_version", "registered_on", "access", "entries"}
+            or manifest["schema_version"] != "1.0.0" or manifest["access"] != "DRIVE_PERMISSION_REQUIRED"):
+        raise ValueError("Invalid person-project manifest")
+    names = {p["name"] for p in people}
+    general_urls = {p["url"] for p in people}
+    eligible = {p["project_id"]: p["name"] for p in directory["projects"] if p["project_id"] != "PRJ-000030"} if directory.get("publication_method") == LIVE else {}
+    seen, ids, rows = set(), set(), []
+    for row in manifest["entries"]:
+        if set(row) != {"name", "project_id", "document_id"}:
+            raise ValueError("Unexpected person-project metadata")
+        name, pid, doc = row["name"], row["project_id"], row["document_id"]
+        url = "https://docs.google.com/document/d/"+doc+"/edit"
+        if (name not in names or not re.fullmatch(r"PRJ-[0-9]{6}",pid) or pid=="PRJ-000030"
+                or not re.fullmatch(r"[A-Za-z0-9_-]{15,100}",doc) or (name,pid) in seen
+                or doc in ids or url in general_urls):
+            raise ValueError("Invalid or duplicate person-project intake")
+        seen.add((name,pid));ids.add(doc)
+        if pid in eligible:
+            rows.append({"name":name,"project_id":pid,"project_name":eligible[pid],"url":url})
+    return rows
+
+def publish_person_project_intake(output, directory):
+    output = Path(output)
+    manifest = json.loads((ROOT / "registry/person-project-intake-links.json").read_text(encoding="utf-8"))
+    people = json.loads((output / "person-intake.json").read_text(encoding="utf-8"))["people"]
+    rows = person_project_rows(manifest, directory, people)
+    payload = {"schema_version":"1.0.0","access":"DRIVE_PERMISSION_REQUIRED",
+               "contents_published":False,"registered_on":manifest["registered_on"],"assignments":rows}
+    (output / "person-project-intake.json").write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    print("Person-project intake link-only directory:",len(rows))
