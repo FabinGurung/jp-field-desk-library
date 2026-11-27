@@ -65,7 +65,9 @@ class ProjectDirectoryTests(unittest.TestCase):
     def test_specialist_cad_identity_collision_is_explicit_hold(self):
         project=(ROOT/"site/projects.html").read_text(encoding="utf-8")
         script=(ROOT/"site/projects.js").read_text(encoding="utf-8")
-        tree=(ROOT/"site/system-map.html").read_text(encoding="utf-8")
+        tree=(ROOT/"site/editing.html").read_text(encoding="utf-8")
+        redirect=(ROOT/"site/system-map.html").read_text(encoding="utf-8")
+        self.assertIn("url=./editing.html",redirect)
         self.assertIn("specialist-projects",project)
         for name in ("ashok-adhikari","harisharan-adhikari",
                      "ramachandra-devkota","js-buddha-jewelers"):
