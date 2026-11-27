@@ -1,5 +1,5 @@
 import unittest
-from publish_intake import project_intake_rows, person_intake_rows, LIVE, ASTAM
+from publish_intake import project_intake_rows, person_intake_rows, person_project_rows, LIVE, ASTAM
 
 class IntakeBoundaryTest(unittest.TestCase):
     def setUp(self):
@@ -35,6 +35,18 @@ class PersonIntakeBoundaryTest(unittest.TestCase):
         del m["entries"][0]["content"]
         m["entries"].append({"name":"example person","document_id":"OtherSyntheticDoc123"})
         with self.assertRaises(ValueError): person_intake_rows(m)
+
+class PersonProjectBoundaryTest(unittest.TestCase):
+    def test_live_eligibility_and_duplicate_guards(self):
+        m={"schema_version":"1.0.0","registered_on":"2026-11-27","access":"DRIVE_PERMISSION_REQUIRED","entries":[
+            {"name":"Person","project_id":"PRJ-000001","document_id":"SyntheticProjectDoc1234"}]}
+        people=[{"name":"Person","url":"https://docs.google.com/document/d/SyntheticGeneralDoc1234/edit"}]
+        directory={"publication_method":LIVE,"projects":[{"project_id":"PRJ-000001","name":"Project"}]}
+        self.assertEqual(person_project_rows(m,directory,people)[0]["project_name"],"Project")
+        directory["publication_method"]="DATED_OWNER_REVIEWED_FALLBACK"
+        self.assertEqual(person_project_rows(m,directory,people),[])
+        m["entries"].append(dict(m["entries"][0]))
+        with self.assertRaises(ValueError): person_project_rows(m,directory,people)
 
 if __name__=="__main__":
     unittest.main()
