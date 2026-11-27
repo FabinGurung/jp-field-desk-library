@@ -36,23 +36,14 @@
    put(pane,"p",(p.status||"Status not verified")+" · "+p.company,"project-meta");
    if(p.verification&&p.verification!=="VERIFIED")put(pane,"p","Some project details still need confirmation.","project-warning");
    const rs=resources(p),ds=docs(p);
-   put(pane,"p",rs.length+" file and folder links · "+ds.length+" client documents","project-count-note");
+   put(pane,"p",new Set(rs.map(r=>r.url)).size+" distinct file and folder links · "+ds.length+" client documents","project-count-note");
    link(pane,"Open project intake journal ↗","./intake.html?project="+encodeURIComponent(p.project_id),"intake-open");
-   const grouped={};for(const r of rs)(grouped[classify(r)] ||= []).push(r);
-   if(ds.length)grouped["Agreements & project packets"]=ds.map(d=>({title:d.title+" · "+d.version,url:d.drive_url,format:"PDF",approval:d.approval}));
-   for(const family of families){
-     const section=put(pane,"details",null,"project-family");
-     section.open=Boolean((grouped[family]||[]).length);
-     const title=put(section,"summary",family);
-     const group=grouped[family]||[];
-     put(title,"small",group.length?(" · "+group.length):" · not listed");
-     if(group.length){const groupWrap=put(section,"div",null,"source-list");
-       for(const r of group){const wrap=put(groupWrap,"div",null,"source-item");
-         link(wrap,r.title+" ↗",r.url,"project-source");
-         put(wrap,"small",(r.format||"Original")+" · Check approved revision before using");
-       }
-     }else put(section,"p","No file listed here yet. Ask the document owner about the final issue.","no-file");
-   }
+   const actions=put(pane,"div",null,"project-owned-actions");
+   if(rs.length||ds.length){
+     link(actions,"Browse all original files in Desk Resources →","./?project="+encodeURIComponent(p.project_id),"project-source");
+     if(ds.length)link(actions,"Open client document packet →","./resources/project-documents.html?project="+encodeURIComponent(p.project_id),"project-source");
+     put(actions,"p","The file gallery is the single detailed browser, with original Drive links and revision warnings.");
+   }else put(actions,"p","No files are registered for this project yet. Check the original project folder or document owner.","no-file");
    if(p.project_id==="JPENT-ASTAM-2026-01"){
       const c=put(pane,"div",null,"project-owned-actions");
       link(c,"Astam land and buyer research →","./feasibility/");
@@ -79,7 +70,7 @@
        link(repoSearch,"Look for this project in "+label+" ↗",
          "https://github.com/FabinGurung/"+repo+"/search?q="+encodeURIComponent(p.project_id)+"&type=code");
      }
-     put(repoSearch,"p","Results may contain working drafts. The file links above are the ones currently listed by this Library.");
+     put(repoSearch,"p","Results may contain working drafts. Use Desk Resources for the reviewed file links.");
    }
    const u=new URL(location.href);u.searchParams.set("project",p.project_id);history.replaceState(null,"",u);
    document.querySelectorAll(".project-card").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.project===p.project_id)));
@@ -94,7 +85,7 @@
      btn.setAttribute("aria-pressed",String(state.selected===p.project_id));
      const header=put(btn,"div",null,"project-card-heading");
      put(header,"strong",p.name);put(header,"small",p.status||"Project");
-     const counts=resources(p).length+docs(p).length;
+     const counts=new Set(resources(p).map(r=>r.url)).size+docs(p).length;
      put(btn,"span",p.company+" · "+p.status,"project-card-meta");
      put(btn,"span",counts?counts+" available file links":"No files listed yet","project-card-evidence");
      btn.addEventListener("click",()=>details(p));
