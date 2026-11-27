@@ -254,10 +254,13 @@
     const stage=make("div",null,"gallery-stage");shell.append(stage);
     const rail=make("div",null,"gallery-rail");stage.append(rail);rail.tabIndex=0;rail.setAttribute("aria-label","Swipeable files");
     const cards=[];
-    for(const item of entries){
+    const unique=new Map();
+    for(const item of entries){const prev=unique.get(item.url);if(prev){prev.duplicates.push(item);if(!prev.slots.includes(item.slot))prev.slots.push(item.slot);prev.slot=prev.slots.join(" / ");}else unique.set(item.url,{...item,duplicates:[],slots:[item.slot]});}
+    for(const item of unique.values()){
       const tile=make("article",null,"file-tile");tile.dataset.format=item.format||"FILE";
       text(tile,"span",item.format||"FILE","file-icon");
-      text(tile,"span",item.slot,"file-category");text(tile,"h4",item.title);
+      text(tile,"span",item.slot,"file-category");text(tile,"h4",item.duplicates.length?"Combined "+item.format+" · "+(item.duplicates.length+1)+" registered roles":item.title);
+      if(item.duplicates.length)for(const r of [item,...item.duplicates])text(tile,"small",r.title+" — "+(humanLabel("approval",r.approval)||"Issue status not recorded"));
       if(item.original_filename&&item.original_filename!==item.title)text(tile,"small",item.original_filename);
       text(tile,"div",item.packet?"Client documents · check approval in packet":humanLabel("approval",item.approval)||"Issue status not recorded","file-warning");
       text(tile,"small",item.packet?"Original files remain in Drive":item.access==="DRIVE_PERMISSION_REQUIRED"?"Google Drive permission required":"Open with existing Drive access");
@@ -309,6 +312,7 @@
     if(p.project_id.startsWith("JPENT-ASTAM-")) { const notice=make("aside",null,"project-context-note");text(notice,"strong","Astam Village · pre-purchase feasibility");text(notice,"p","Purchase on HOLD · original JP Enterprise sources · approval unverified · permanent PRJ ID pending.");const guide=text(notice,"a","View existing feasibility research ↗");guide.href="./feasibility/";root.append(notice); }
     const stack = make("div",null,"group-stack");
     let matchingFiles = 0;
+    const listedOriginals=new Map();
     const galleryEntries=[];
     const hasQuery = Boolean(state.query);
     const hasFacets = Object.values(state.facets).some(Boolean);
@@ -347,6 +351,9 @@
           a.href="./resources/project-documents.html?project="+encodeURIComponent(p.project_id);
         } else if (matched.length) {
           for (const r of matched) {
+            const first=listedOriginals.get(r.url);
+            if(first){text(content,"p",r.title+" — same original as "+first+". "+(humanLabel("approval",r.approval)||"Issue status not recorded"),"slot-empty");continue;}
+            listedOriginals.set(r.url,slot.label);
             const entry=make("div",null,"resource-entry");
             const btn=make("button",null,"resource-line");
             btn.type="button";
@@ -380,7 +387,7 @@
       stack.append(groupCard);
     }
     $("facet-count").textContent=matchingFiles+" of "+p.resource_count+
-      " resources match · Full list includes empty categories";
+      " catalogue references match · "+listedOriginals.size+" distinct file/folder links · Full list includes empty categories";
     root.append(fileGallery(p,galleryEntries,stack));
     root.append(stack);
     const siblings=orderedProjects(state.company),at=siblings.findIndex(x=>x.project_id===p.project_id);

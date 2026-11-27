@@ -80,17 +80,32 @@ async function qa() {
     await page.locator("#intake-search").fill("not a project");assert.equal(await page.locator(".intake-card").count(),0);
     await page.unroute("**/project-intake.json");
     await page.getByRole("button",{name:"By person",exact:true}).click();
-    await page.locator("#person-intake-grid .intake-open").first().waitFor();
+    await page.locator("#person-intake-grid .person-selector").first().waitFor();
     assert.ok(await page.locator("#person-intake-grid .intake-card").count()>=3);
     assert.equal(await page.locator("#project-intake-section").isVisible(),false);
     assert.match(await page.locator("#person-intake-grid").innerText(),/Krishna Kumar Gupta/);
+    await page.locator("#person-intake-grid .person-selector").first().click();
+    assert.equal(await page.locator("#person-project-grid .intake-open").count(),1); // fallback withholds project-specific links
+    await page.route("**/person-project-intake.json", route=>route.fulfill({json:{schema_version:"1.0.0",access:"DRIVE_PERMISSION_REQUIRED",contents_published:false,assignments:[{name:"Fabin Gurung",project_id:"PRJ-000001",project_name:"Fixture project",url:"https://docs.google.com/document/d/SyntheticPersonProjectDoc123/edit"}]}}));
+    await page.goto(ROOT+"/intake.html?view=person&person=Fabin%20Gurung",{waitUntil:"domcontentloaded"});
+    await page.locator("#person-project-grid .intake-open").nth(1).waitFor();
+    assert.equal(await page.locator("#person-project-grid .intake-open").count(),2);
+    assert.match(await page.locator("#person-project-grid").innerText(),/Fixture project/);
+    await page.unroute("**/person-project-intake.json");
     await page.getByRole("button",{name:"By project",exact:true}).click();
     assert.equal(await page.locator("#person-intake-section").isVisible(),false);
+    await page.goto(ROOT + "/system-map.html#versions", {waitUntil:"domcontentloaded"});
+    await page.waitForURL("**/editing.html#versions");
     await page.goto(ROOT + "/editing.html", {waitUntil:"domcontentloaded"});
     assert.match(await page.locator("main").innerText(),/Project Resources Google Sheet/);
     assert.match(await page.locator("main").innerText(),/Record the current issue or approval status/);
     await page.route('https://fabingurung.github.io/jp-estimating-and-boq/**', route =>
       route.fulfill({body: 'Estimation fixture'}));
+    await page.goto(ROOT + "/feasibility/buyer-guide/#checklist",{waitUntil:"domcontentloaded"});
+    await page.waitForURL("**/feasibility/#rg-questions");
+    await page.locator(".rg-question").first().waitFor({state:"attached"});
+    assert.equal(await page.locator(".rg-question").count(),46);
+    assert.equal(await page.locator("#guide-list").count(),0);
     await page.goto(ROOT + "/field.html#measurements");
     assert.equal(new URL(page.url()).hash, '#measurements');
     assert.ok(page.url().includes('/jp-estimating-and-boq/field.html'));

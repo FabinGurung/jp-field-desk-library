@@ -62,6 +62,23 @@ def validate(directory):
                 or not re.fullmatch(r"https://docs\.google\.com/document/d/[A-Za-z0-9_-]{15,100}/edit", row["url"])):
             raise ValueError("Unsafe or duplicate personal intake link")
         person_names.add(row["name"].strip().casefold()); person_urls.add(row["url"])
+    pp = json.loads((directory / "person-project-intake.json").read_text(encoding="utf-8"))
+    if (set(pp) != {"schema_version", "access", "contents_published", "registered_on", "assignments"}
+            or pp["schema_version"] != "1.0.0" or pp["access"] != "DRIVE_PERMISSION_REQUIRED"
+            or pp["contents_published"] is not False):
+        raise ValueError("Invalid person-project boundary")
+    pairs, pp_urls = set(), set()
+    people = {p["name"] for p in person_intake["people"]}
+    for row in pp["assignments"]:
+        if set(row) != {"name", "project_id", "project_name", "url"}:
+            raise ValueError("Unexpected personal project metadata")
+        pid, name, url = row["project_id"], row["name"], row["url"]
+        if (name not in people or pid not in eligible or not re.fullmatch(r"PRJ-[0-9]{6}",pid)
+                or row["project_name"] != eligible[pid]["name"] or (name,pid) in pairs
+                or url in pp_urls or url in intake_urls or url in person_urls
+                or not re.fullmatch(r"https://docs\.google\.com/document/d/[A-Za-z0-9_-]{15,100}/edit",url)):
+            raise ValueError("Invalid or duplicate person-project publication")
+        pairs.add((name,pid));pp_urls.add(url)
     guide = (directory / "editing.html").read_text(encoding="utf-8")
     links = re.findall(r'href="(https://docs\.google\.com/spreadsheets/d/[A-Za-z0-9_-]+/edit)"', guide)
     if len(set(links)) != 1:
@@ -124,9 +141,7 @@ def validate(directory):
     # Astam's previously public-safe client resources live with the Library.
     astam_routes = (
         "feasibility/index.html", "feasibility/buyer-guide/index.html",
-        "feasibility/buyer-guide/guide.json",
         "ops/data/land-feasibility/astam-village-public.v1.0.json",
-        "ops/data/land-feasibility/astam-buyer-guide-public.v1.0.json",
         "assets/css/jp-theme-tokens.css", "assets/css/site-shell.css",
         "assets/css/jp-botanical.css", "assets/botanical/garden-left.svg",
         "assets/botanical/garden-right.svg", "assets/botanical/corner-sprig.svg",
@@ -136,9 +151,16 @@ def validate(directory):
         if not (directory / path).is_file():
             raise ValueError("Missing migrated Astam route/asset: " + path)
     overview = json.loads((directory / "ops/data/land-feasibility/astam-village-public.v1.0.json").read_text())
-    guide = json.loads((directory / "feasibility/buyer-guide/guide.json").read_text())
+    embedded = re.search(r'<script type="application/json" id="rg-embedded">(.*?)</script>', (directory / "feasibility/index.html").read_text(encoding="utf-8"), re.S)
+    if not embedded:
+        raise ValueError("Missing canonical buyer guide")
+    guide = json.loads(embedded.group(1))
+    if len(guide.get("checklist", [])) != 46 or any((directory / p).exists() for p in ("feasibility/buyer-guide/guide.json", "ops/data/land-feasibility/astam-buyer-guide-public.v1.0.json")):
+        raise ValueError("Duplicated or incomplete buyer guide")
     if overview["project"].get("legal_status") != "UNVERIFIED" or not guide.get("public_scope") == "EDUCATIONAL_PUBLIC_SAFE":
         raise ValueError("Astam feasibility and buyer guide qualification drift")
+    from audit_routes import audit_routes
+    audit_routes(directory)
     return {"companies": len(companies), "projects": len(projects),
             "resources": len(catalog["resources"]), "packet_files": len(packets["documents"])}
 

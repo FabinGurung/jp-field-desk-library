@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0.0",
+  "registered_on": "2026-11-27",
+  "access": "DRIVE_PERMISSION_REQUIRED",
+  "entries": [
+    {
+      "name": "Fabin Gurung",
+      "project_id": "PRJ-000001",
+      "document_id": "1oK3eOTtT5b03hQPa6YZUHK3pv8lHXoVqVs9JR5gmd5w"
+    },
+    {
+      "name": "Fabin Gurung",
+      "project_id": "PRJ-000003",
+      "document_id": "1mY2rnnZB3o7_eiVz4zuUTvrMQTAbzZrG9ecHoosLCHA"
+    },
+    {
+      "name": "Fabin Gurung",
+      "project_id": "PRJ-000006",
+      "document_id": "1wRI8CcWCXBA71XbBmWwMktwfTMWwCXZMdQgSNk_ZGKc"
+    },
+    {
+      "name": "Fabin Gurung",
+      "project_id": "PRJ-000008",
+      "document_id": "1-bkyi6EjhTnH6G52wP7YzuD8Cl9NfcNZ-mDP0qeNH2s"
+    },
+    {
+      "name": "Fabin Gurung",
+      "project_id": "PRJ-000018",
+      "document_id": "1MVuZhtndp3yfKWzyY9fB7OEr2RP6tdcH8QD7h2NrGiU"
+    },
+    {
+      "name": "Fabin Gurung",
+      "project_id": "PRJ-000020",
+      "document_id": "11543QUY5_EIAVFVg_OmMHaZapw7aj_xgUPW6CUpeeSY"
+    },
+    {
+      "name": "Krishna Kumar Gupta",
+      "project_id": "PRJ-000001",
+      "document_id": "160qmE6YAPbAmML7pzzL1BhtocZ_b3rKURQwncOWxbDA"
+    },
+    {
+      "name": "Shiv Narayan Chaudhary",
+      "project_id": "PRJ-000002",
+      "document_id": "1BVhHbcF07StIdZ7DimNZZeChDIdg-xakD7c2DeIOlvQ"
+    },
+    {
+      "name": "Shiv Narayan Chaudhary",
+      "project_id": "PRJ-000003",
+      "document_id": "1Bfm_BkAxoKnBs69MEzEQeq3YBj3uNT2BfUAJ9dKy6qA"
+    },
+    {
+      "name": "Shiv Narayan Chaudhary",
+      "project_id": "PRJ-000005",
+      "document_id": "18XxzwuHmCfIA7dzC4wBR8hA--Sb6ZuGATtdLqVMPEDo"
+    },
+    {
+      "name": "Shiv Narayan Chaudhary",
+      "project_id": "PRJ-000006",
+      "document_id": "17PG2Gr24SGrZS0Uoho8FfrzazLioPzuNy3gDaf24rEM"
+    },
+    {
+      "name": "Shiv Narayan Chaudhary",
+      "project_id": "PRJ-000007",
+      "document_id": "12PkWk8gKhY_HEVBbw2ywkzTKMnUO9G_8JaD0CRx3L10"
+    },
+    {
+      "name": "Shiv Narayan Chaudhary",
+      "project_id": "PRJ-000017",
+      "document_id": "1YSWWc9ive20IVzNLboA6J5LTFZKOByJfPK5gD3N6dZw"
+    },
+    {
+      "name": "Shiv Narayan Chaudhary",
+      "project_id": "PRJ-000019",
+      "document_id": "1vBJ5sJ8_cPkPqxXkZekQIiFOsVpZklswSS7ZNbdnzR8"
+    },
+    {
+      "name": "Shiv Narayan Chaudhary",
+      "project_id": "PRJ-000020",
+      "document_id": "1CeoVszI7shuL3HLB72Rtdw8CdEhyovt7CcD5W_YhkkU"
+    }
+  ]
+}
