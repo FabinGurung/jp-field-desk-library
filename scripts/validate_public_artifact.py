@@ -62,6 +62,23 @@ def validate(directory):
                 or not re.fullmatch(r"https://docs\.google\.com/document/d/[A-Za-z0-9_-]{15,100}/edit", row["url"])):
             raise ValueError("Unsafe or duplicate personal intake link")
         person_names.add(row["name"].strip().casefold()); person_urls.add(row["url"])
+    pp = json.loads((directory / "person-project-intake.json").read_text(encoding="utf-8"))
+    if (set(pp) != {"schema_version", "access", "contents_published", "registered_on", "assignments"}
+            or pp["schema_version"] != "1.0.0" or pp["access"] != "DRIVE_PERMISSION_REQUIRED"
+            or pp["contents_published"] is not False):
+        raise ValueError("Invalid person-project boundary")
+    pairs, pp_urls = set(), set()
+    people = {p["name"] for p in person_intake["people"]}
+    for row in pp["assignments"]:
+        if set(row) != {"name", "project_id", "project_name", "url"}:
+            raise ValueError("Unexpected personal project metadata")
+        pid, name, url = row["project_id"], row["name"], row["url"]
+        if (name not in people or pid not in eligible or not re.fullmatch(r"PRJ-[0-9]{6}",pid)
+                or row["project_name"] != eligible[pid]["name"] or (name,pid) in pairs
+                or url in pp_urls or url in intake_urls or url in person_urls
+                or not re.fullmatch(r"https://docs\.google\.com/document/d/[A-Za-z0-9_-]{15,100}/edit",url)):
+            raise ValueError("Invalid or duplicate person-project publication")
+        pairs.add((name,pid));pp_urls.add(url)
     guide = (directory / "editing.html").read_text(encoding="utf-8")
     links = re.findall(r'href="(https://docs\.google\.com/spreadsheets/d/[A-Za-z0-9_-]+/edit)"', guide)
     if len(set(links)) != 1:
