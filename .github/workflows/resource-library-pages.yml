@@ -197,6 +197,17 @@ jobs:
       - uses: actions/deploy-pages@v4
         id: deployment
 
+  verify-served-pages:
+    needs: deploy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Read back deployed Pages routes, source and link-only data
+        run: python scripts/verify_served_site.py
+
   release-cutover:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: deploy
