@@ -255,7 +255,7 @@
     const rail=make("div",null,"gallery-rail");stage.append(rail);rail.tabIndex=0;rail.setAttribute("aria-label","Swipeable files");
     const cards=[];
     const unique=new Map();
-    for(const item of entries){const prev=unique.get(item.url);if(prev){prev.duplicates.push(item);prev.slot=[...new Set([prev.slot,...prev.duplicates.map(x=>x.slot)])].join(" / ");}else unique.set(item.url,{...item,duplicates:[]});}
+    for(const item of entries){const prev=unique.get(item.url);if(prev){prev.duplicates.push(item);if(!prev.slots.includes(item.slot))prev.slots.push(item.slot);prev.slot=prev.slots.join(" / ");}else unique.set(item.url,{...item,duplicates:[],slots:[item.slot]});}
     for(const item of unique.values()){
       const tile=make("article",null,"file-tile");tile.dataset.format=item.format||"FILE";
       text(tile,"span",item.format||"FILE","file-icon");
