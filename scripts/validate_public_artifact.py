@@ -141,9 +141,7 @@ def validate(directory):
     # Astam's previously public-safe client resources live with the Library.
     astam_routes = (
         "feasibility/index.html", "feasibility/buyer-guide/index.html",
-        "feasibility/buyer-guide/guide.json",
         "ops/data/land-feasibility/astam-village-public.v1.0.json",
-        "ops/data/land-feasibility/astam-buyer-guide-public.v1.0.json",
         "assets/css/jp-theme-tokens.css", "assets/css/site-shell.css",
         "assets/css/jp-botanical.css", "assets/botanical/garden-left.svg",
         "assets/botanical/garden-right.svg", "assets/botanical/corner-sprig.svg",
@@ -153,7 +151,12 @@ def validate(directory):
         if not (directory / path).is_file():
             raise ValueError("Missing migrated Astam route/asset: " + path)
     overview = json.loads((directory / "ops/data/land-feasibility/astam-village-public.v1.0.json").read_text())
-    guide = json.loads((directory / "feasibility/buyer-guide/guide.json").read_text())
+    embedded = re.search(r'<script type="application/json" id="rg-embedded">(.*?)</script>', (directory / "feasibility/index.html").read_text(encoding="utf-8"), re.S)
+    if not embedded:
+        raise ValueError("Missing canonical buyer guide")
+    guide = json.loads(embedded.group(1))
+    if len(guide.get("checklist", [])) != 46 or any((directory / p).exists() for p in ("feasibility/buyer-guide/guide.json", "ops/data/land-feasibility/astam-buyer-guide-public.v1.0.json")):
+        raise ValueError("Duplicated or incomplete buyer guide")
     if overview["project"].get("legal_status") != "UNVERIFIED" or not guide.get("public_scope") == "EDUCATIONAL_PUBLIC_SAFE":
         raise ValueError("Astam feasibility and buyer guide qualification drift")
     return {"companies": len(companies), "projects": len(projects),
