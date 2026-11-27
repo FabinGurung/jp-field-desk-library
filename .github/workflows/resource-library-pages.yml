@@ -6,6 +6,7 @@ on:
       - 'scripts/**'
       - 'registry/project-intake-links.json'
       - 'registry/person-intake-links.json'
+      - 'registry/person-project-intake-links.json'
       - '.github/source-gallery/**'
       - 'docs/releases/v1.3.0.md'
       - 'docs/releases/v1.3.2.md'
@@ -29,6 +30,7 @@ on:
       - 'scripts/**'
       - 'registry/project-intake-links.json'
       - 'registry/person-intake-links.json'
+      - 'registry/person-project-intake-links.json'
       - '.github/source-gallery/**'
       - 'docs/releases/v1.3.0.md'
       - 'docs/releases/v1.3.2.md'
@@ -257,9 +259,7 @@ jobs:
           fi
           pages="https://fabingurung.github.io/${GITHUB_REPOSITORY#*/}"
           for file in feasibility/index.html feasibility/buyer-guide/index.html \
-            feasibility/buyer-guide/guide.json \
             ops/data/land-feasibility/astam-village-public.v1.0.json \
-            ops/data/land-feasibility/astam-buyer-guide-public.v1.0.json \
             assets/css/jp-theme-tokens.css assets/css/site-shell.css \
             assets/css/jp-botanical.css; do
             curl -fsS --retry 6 --retry-delay 4 --retry-all-errors "$pages/$file?commit=$GITHUB_SHA" \
