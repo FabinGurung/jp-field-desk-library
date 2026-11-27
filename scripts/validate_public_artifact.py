@@ -159,6 +159,8 @@ def validate(directory):
         raise ValueError("Duplicated or incomplete buyer guide")
     if overview["project"].get("legal_status") != "UNVERIFIED" or not guide.get("public_scope") == "EDUCATIONAL_PUBLIC_SAFE":
         raise ValueError("Astam feasibility and buyer guide qualification drift")
+    from audit_routes import audit_routes
+    audit_routes(directory)
     return {"companies": len(companies), "projects": len(projects),
             "resources": len(catalog["resources"]), "packet_files": len(packets["documents"])}
 
